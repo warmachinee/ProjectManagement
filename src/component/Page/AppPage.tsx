@@ -34,6 +34,20 @@ const RouteProject = Loadable.Map({
   loading: () => null
 });
 
+const RouteProjectTable = Loadable.Map({
+  loader: {
+    RouteProjectTable: () =>
+      import(
+        /* webpackChunkName: 'RouteProjectTable' */ "../Table/Project/ProjectTable"
+      )
+  },
+  render(loaded: any, props: any) {
+    let Component = loaded.RouteProjectTable.default;
+    return <Route {...props} render={() => <Component {...props} />} />;
+  },
+  loading: () => null
+});
+
 const RouteTestApi = Loadable.Map({
   loader: {
     TestApi: () =>
@@ -102,6 +116,7 @@ const AppPage: React.FC<AppPageProps> = props => {
             component={isAuth ? AccountPage : Authentication}
           />
           <RouteProject path="/project/:projectid" />
+          <RouteProjectTable path="/project/" />
 
           <RouteTestApi path="/testapi" />
         </Switch>

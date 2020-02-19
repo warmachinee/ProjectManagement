@@ -1,18 +1,33 @@
-import React, { useContext, useState, useCallback, useEffect } from "react";
+import React, {
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  useReducer
+} from "react";
 import Loadable from "react-loadable";
-import {
-  TableBody,
-  TableRow,
-  TableCell,
-  TextField,
-  Button,
-  Typography
-} from "@material-ui/core";
+import { Typography } from "@material-ui/core";
 import update from "immutability-helper";
-import { makeStyles } from "@material-ui/core/styles";
 import AppType, { Subtask } from "apptype";
 import { AppContext } from "../../../AppContext";
 import SubtaskRow from "./SubtaskRow";
+import CreateSubtaskRow from "./ColumnAndRow/CreateSubtaskRow";
+
+const EntertainAndTravelCost = Loadable({
+  loader: () =>
+    import(
+      /* webpackChunkName: 'EntertainAndTravelCost' */ "./ChildComponent/EntertainAndTravelCost"
+    ),
+  loading: () => null
+});
+
+const GeneralDialog = Loadable({
+  loader: () =>
+    import(
+      /* webpackChunkName: 'GeneralDialog' */ "../../Dialog/GeneralDialog"
+    ),
+  loading: () => null
+});
 
 const ConfirmDialog = Loadable({
   loader: () =>
@@ -22,58 +37,27 @@ const ConfirmDialog = Loadable({
   loading: () => null
 });
 
-const useStyles = makeStyles(theme => ({
-  createTextField: { display: "flex" },
-  textField: { marginRight: 8, flexGrow: 1 }
-}));
-
 export interface SubtaskBodyProps {
   task: AppType.ProjectTask;
+  setTaskPercent: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const CreateSubtaskRow: React.FC<{ [keys: string]: any }> = props => {
-  const classes = useStyles();
-  const { subtaskName, setSubtaskName, _onEnter, handleCreateSubtask } = props;
-  return (
-    <TableRow>
-      <TableCell colSpan={2} />
-      <TableCell colSpan={1}>
-        <div className={classes.createTextField}>
-          <TextField
-            className={classes.textField}
-            name="subtaskName"
-            size="small"
-            value={subtaskName}
-            variant="outlined"
-            placeholder="Subtask name"
-            onChange={e => setSubtaskName(e.target.value)}
-            onKeyPress={_onEnter(handleCreateSubtask)}
-          />
-          <Button
-            disabled={subtaskName === ""}
-            variant="contained"
-            color="primary"
-            onClick={handleCreateSubtask}
-          >
-            Create
-          </Button>
-        </div>
-      </TableCell>
-      <TableCell colSpan={8} />
-    </TableRow>
-  );
-};
-
-const SubtaskBody: React.FC<SubtaskBodyProps> = ({ task }) => {
-  const classes = useStyles();
+const SubtaskBody: React.FC<SubtaskBodyProps> = ({ task, setTaskPercent }) => {
   const {
     apiUrl,
     fetchPost,
     projectid,
     _onLocalhostFn,
     _onEnter,
-    useConfirmDeleteItem
+    useConfirmDeleteItem,
+    booleanReducer
   } = useContext(AppContext);
+  const [{ note, addCost }, booleanDispatch] = useReducer<
+    React.Reducer<AppType.BooleanReducerState, AppType.BooleanReducerActions>
+  >(booleanReducer, {
+    note: false,
+    addCost: false
+  });
   const [current, setCurrent] = useState<AppType.Subtask | null>(null);
   const [target, setTarget] = useState<AppType.Subtask | null>(null);
   const [subtaskName, setSubtaskName] = useState<string>("");
@@ -85,10 +69,15 @@ const SubtaskBody: React.FC<SubtaskBodyProps> = ({ task }) => {
     { confirmState, item: subtaskOnDelete },
     onDeleteSubtask
   ] = useConfirmDeleteItem();
+  const [dataOnClickAction, setDataOnClickAction] = useState<Subtask | null>(
+    null
+  );
   const passingProps: any = {
     ...useContext(AppContext),
     handleMoveSubtask,
-    onDeleteSubtask
+    onDeleteSubtask,
+    booleanDispatch,
+    onClickAction
   };
 
   const moveSubtask = useCallback(
@@ -109,6 +98,11 @@ const SubtaskBody: React.FC<SubtaskBodyProps> = ({ task }) => {
     },
     [data, target]
   );
+
+  function onClickAction(type: "addCost" | "note", data: Subtask) {
+    setDataOnClickAction(data);
+    booleanDispatch({ type: "true", key: type });
+  }
 
   async function handleMoveSubtask(
     current: AppType.Subtask,
@@ -173,6 +167,7 @@ const SubtaskBody: React.FC<SubtaskBodyProps> = ({ task }) => {
     });
     console.log(response);
     setData(response);
+    setTaskPercent(response.percent);
   }
 
   function handleFetchTemp() {
@@ -183,10 +178,10 @@ const SubtaskBody: React.FC<SubtaskBodyProps> = ({ task }) => {
           subtaskid: 889274205,
           sequence: 1,
           subtaskname: "Subtask1",
-          startdate: null,
+          startdate: "2020-01-08T20:40:44.000Z",
           enddate: null,
           note: null,
-          createdate: "2020-02-18T20:40:44.000Z",
+          createdate: "2020-01-08T20:40:44.000Z",
           status: "inprogress",
           cost: null
         },
@@ -220,7 +215,7 @@ const SubtaskBody: React.FC<SubtaskBodyProps> = ({ task }) => {
             handleCreateSubtask
           }}
         />
-        {data && (
+        {data && task && (
           <React.Fragment>
             {data.list.map((d: AppType.Subtask, i: number) => {
               return (
@@ -240,6 +235,27 @@ const SubtaskBody: React.FC<SubtaskBodyProps> = ({ task }) => {
             })}
           </React.Fragment>
         )}
+        <GeneralDialog
+          open={note}
+          onClose={() => booleanDispatch({ type: "false", key: "note" })}
+          title="Subtask note"
+        >
+          Note
+        </GeneralDialog>
+        <GeneralDialog
+          open={addCost}
+          onClose={() => booleanDispatch({ type: "false", key: "addCost" })}
+          title="Entertainment and Travel cost"
+        >
+          <EntertainAndTravelCost
+            {...{
+              addCost,
+              handleLoadSubtask,
+              booleanDispatch,
+              dataOnClickAction
+            }}
+          />
+        </GeneralDialog>
         <ConfirmDialog
           type="delete"
           open={confirmState}

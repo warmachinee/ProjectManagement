@@ -33,7 +33,7 @@ const AppBreadcrumbs: React.FC<AppBreadcrumbsProps> = ({ location }) => {
   return (
     <Breadcrumbs
       separator={<NavigateNext fontSize="small" />}
-      style={{ padding: 8, marginTop: 8 }}
+      style={{ padding: "8px 24px", marginTop: 8 }}
     >
       {location.pathname === "/" ? (
         <Typography color="textPrimary">Home</Typography>

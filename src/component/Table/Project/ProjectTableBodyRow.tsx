@@ -1,7 +1,13 @@
 import React, { useContext, useRef, useState, useCallback } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Link as RouterLink } from "react-router-dom";
-import { TableRow, TableCell, Link, IconButton } from "@material-ui/core";
+import {
+  TableRow,
+  TableCell,
+  Link,
+  IconButton,
+  Tooltip
+} from "@material-ui/core";
 import { useDrag, useDrop, DropTargetMonitor } from "react-dnd";
 import AppType from "apptype";
 import { AppContext } from "../../../AppContext";
@@ -9,7 +15,9 @@ import { grey, green } from "@material-ui/core/colors";
 import { DragIndicator, Delete } from "@material-ui/icons";
 import ItemTypes from "../ItemTypes";
 
-const useStyles = makeStyles(theme => ({}));
+const useStyles = makeStyles(theme => ({
+  tooltip: { fontSize: 14 }
+}));
 
 export interface ProjectTableBodyRowProps {
   itemIndex: number;
@@ -142,9 +150,15 @@ const ProjectTableBodyRow: React.FC<ProjectTableBodyRowProps> = props => {
       </TableCell>
       <TableCell padding="checkbox">
         {isHover ? (
-          <IconButton onClick={() => onDeleteProject(data)}>
-            <Delete />
-          </IconButton>
+          <Tooltip
+            title="Delete project"
+            placement="top"
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <IconButton onClick={() => onDeleteProject(data)}>
+              <Delete />
+            </IconButton>
+          </Tooltip>
         ) : (
           <div style={{ width: 24, height: 24, padding: 12 }} />
         )}

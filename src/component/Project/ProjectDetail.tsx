@@ -231,6 +231,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = () => {
       [name]: event.target.value
     });
   };
+  
   const handleChange = (name: keyof State) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {

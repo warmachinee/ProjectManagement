@@ -1,78 +1,19 @@
 import React, { useContext, useState, useCallback } from "react";
-import {
-  TableBody,
-  TableRow,
-  TableCell,
-  TextField,
-  Button,
-  useTheme
-} from "@material-ui/core";
+import { TableBody } from "@material-ui/core";
 import update from "immutability-helper";
-import { makeStyles } from "@material-ui/core/styles";
 import AppType from "apptype";
 import { AppContext } from "../../../AppContext";
 import TaskTableBodyRow from "./TaskTableBodyRow";
-
-const useStyles = makeStyles(theme => ({
-  createTextField: { display: "flex" },
-  textField: { marginRight: 8, flexGrow: 1 }
-}));
+import CreateTaskRow from "./ColumnAndRow/CreateTaskRow";
 
 export interface TaskTableBodyProps {}
 
-const CreateTaskRow: React.FC<{ [keys: string]: any }> = props => {
-  const classes = useStyles();
-  const theme = useTheme();
-  const {
-    taskName,
-    setTaskName,
-    _onEnter,
-    handleCreateTask,
-    isDarkMode
-  } = props;
-
-  let backgroundColor = isDarkMode
-    ? theme.palette.grey[700]
-    : theme.palette.grey[100];
-
-  return (
-    <TableRow style={{ backgroundColor }}>
-      <TableCell colSpan={2} />
-      <TableCell colSpan={1}>
-        <div className={classes.createTextField}>
-          <TextField
-            className={classes.textField}
-            name="taskName"
-            size="small"
-            value={taskName}
-            variant="outlined"
-            placeholder="Task name"
-            onChange={e => setTaskName(e.target.value)}
-            onKeyPress={_onEnter(handleCreateTask)}
-          />
-          <Button
-            disabled={taskName === ""}
-            variant="contained"
-            color="primary"
-            onClick={handleCreateTask}
-          >
-            Create
-          </Button>
-        </div>
-      </TableCell>
-      <TableCell colSpan={8} />
-    </TableRow>
-  );
-};
-
 const TaskTableBody: React.FC<TaskTableBodyProps> = React.memo(() => {
-  const classes = useStyles();
   const {
     apiUrl,
     fetchPost,
     project,
     setProject,
-    useForm,
     projectid,
     handleLoadProjectDetail,
     _onEnter,

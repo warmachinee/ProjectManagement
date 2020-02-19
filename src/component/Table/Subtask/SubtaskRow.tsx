@@ -6,18 +6,33 @@ import {
   IconButton,
   InputBase,
   Button,
-  Typography
+  Typography,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  Tooltip
 } from "@material-ui/core";
 import { useDrag, useDrop, DropTargetMonitor } from "react-dnd";
-import AppType, { ProjectTask } from "apptype";
+import AppType, { ProjectTask, TaskStatus, SubtaskStatus } from "apptype";
 import { AppContext } from "../../../AppContext";
-import { grey } from "@material-ui/core/colors";
-import { DragIndicator, Delete, KeyboardArrowDown } from "@material-ui/icons";
+import { grey, green, amber } from "@material-ui/core/colors";
+import {
+  DragIndicator,
+  Delete,
+  CheckCircle,
+  Schedule,
+  Pause,
+  Description,
+  NoteAdd,
+  AttachMoney
+} from "@material-ui/icons";
 import ItemTypes from "../ItemTypes";
-import Percent from "../../Chart/Percent";
 import { DatePicker } from "@material-ui/pickers";
 
-const useStyles = makeStyles(theme => ({ dateInput: { cursor: "pointer" } }));
+const useStyles = makeStyles(theme => ({
+  dateInput: { cursor: "pointer" },
+  tooltip: { fontSize: 14 }
+}));
 
 interface SubtaskRowProps {
   itemIndex: number;
@@ -43,7 +58,7 @@ const CellSubtaskName: React.FC<any> = ({
   projectid,
   subtaskid,
   subtaskName,
-  task
+  taskid
 }) => {
   const [value, setValue] = useState(subtaskName);
 
@@ -53,7 +68,7 @@ const CellSubtaskName: React.FC<any> = ({
       body: {
         action: "edit",
         projectid,
-        taskid: task.taskid,
+        taskid: taskid,
         subtaskid: subtaskid,
         subtaskname: value
       }
@@ -94,30 +109,31 @@ const CellDate: React.FC<any> = ({
   fetchPost,
   handleLoadSubtask,
   projectid,
-  task,
+  taskid,
   data,
   subtaskid,
   label,
   date,
   _dateToString,
   _dateToAPI,
-  keys
+  keys,
+  task
 }) => {
   const classes = useStyles();
   async function onEditDate(date: Date) {
     console.log({
       action: "edit",
       projectid,
-      taskid: task.taskid,
+      taskid: taskid,
       subtaskid,
       [keys]: _dateToAPI(date)
     });
     const response = await fetchPost({
-      url: apiUrl("tasksystem"),
+      url: apiUrl("subtasksystem"),
       body: {
         action: "edit",
         projectid,
-        taskid: task.taskid,
+        taskid: taskid,
         subtaskid,
         [keys]: _dateToAPI(date)
       }
@@ -141,7 +157,7 @@ const CellDate: React.FC<any> = ({
 
   function getMaxDate() {
     if (detail.enddate) {
-      return { maxDate: new Date(detail.enddate) };
+      return { maxDate: new Date(detail.enddate), maxDateMessage: "" };
     }
     return {};
   }
@@ -149,20 +165,145 @@ const CellDate: React.FC<any> = ({
   return (
     <TableCell>
       <DatePicker
-        autoOk
         fullWidth
-        variant="inline"
         inputVariant="outlined"
         label={label}
         value={date ? new Date(date) : new Date()}
         minDate={getMinDate()}
+        minDateMessage=""
         {...getMaxDate()}
         onChange={(d: any) => onEditDate(new Date(d))}
-        views={["year", "month", "date"]}
         labelFunc={() => {
           return date ? _dateToString(new Date(date)) : "Select date";
         }}
       />
+    </TableCell>
+  );
+};
+
+const CellStatus: React.FC<{ status: TaskStatus } | any> = ({
+  status,
+  apiUrl,
+  fetchPost,
+  handleLoadSubtask,
+  projectid,
+  subtaskid,
+  taskid
+}) => {
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  function getIconFromStatus() {
+    switch (status) {
+      case "inprogress":
+        return <Schedule style={{ color: amber[600] }} />;
+      case "pending":
+        return <Pause />;
+      case "complete":
+        return <CheckCircle style={{ color: green[600] }} />;
+      default:
+        break;
+    }
+  }
+
+  async function handleChangeStatus(value: SubtaskStatus) {
+    const response = await fetchPost({
+      url: apiUrl("subtasksystem"),
+      body: {
+        action: "edit",
+        projectid,
+        taskid: taskid,
+        subtaskid: subtaskid,
+        status: value
+      }
+    });
+    console.log(response);
+    handleClose();
+    await handleLoadSubtask();
+  }
+
+  return (
+    <TableCell>
+      <IconButton onClick={handleClick}>{getIconFromStatus()}</IconButton>
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+        <MenuItem onClick={() => handleChangeStatus("inprogress")}>
+          <ListItemIcon>
+            <Schedule style={{ color: amber[600] }} />
+          </ListItemIcon>
+          <Typography>Inprogress</Typography>
+        </MenuItem>
+        <MenuItem onClick={() => handleChangeStatus("pending")}>
+          <ListItemIcon>
+            <Pause />
+          </ListItemIcon>
+          <Typography>Pending</Typography>
+        </MenuItem>
+        <MenuItem onClick={() => handleChangeStatus("complete")}>
+          <ListItemIcon>
+            <CheckCircle style={{ color: green[600] }} />
+          </ListItemIcon>
+          <Typography>Complete</Typography>
+        </MenuItem>
+      </Menu>
+    </TableCell>
+  );
+};
+
+const CellAction: React.FC<any> = ({ isHover, data }) => {
+  const classes = useStyles();
+  const { onDeleteSubtask, onClickAction } = useContext(AppContext);
+  function getNoteIcon() {
+    switch (true) {
+      case data.note !== null && data.note.length > 0:
+        return <Description />;
+      default:
+        return <NoteAdd />;
+    }
+  }
+  return (
+    <TableCell padding="checkbox" colSpan={4}>
+      {isHover ? (
+        <div style={{ display: "flex" }}>
+          <Tooltip
+            title="Note"
+            placement="top"
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <IconButton onClick={() => onClickAction("note", data)}>
+              {getNoteIcon()}
+            </IconButton>
+          </Tooltip>
+          <Tooltip
+            title="Cost"
+            placement="top"
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <IconButton onClick={() => onClickAction("addCost", data)}>
+              <AttachMoney />
+            </IconButton>
+          </Tooltip>
+          <Tooltip
+            title="Delete subtask"
+            placement="top"
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <IconButton
+              onClick={() => onDeleteSubtask({ action: "delete", item: data })}
+            >
+              <Delete />
+            </IconButton>
+          </Tooltip>
+        </div>
+      ) : (
+        <div style={{ width: 24, height: 24, padding: 12 }} />
+      )}
     </TableCell>
   );
 };
@@ -181,7 +322,6 @@ const SubtaskRow: React.FC<SubtaskRowProps> = props => {
   const {
     apiUrl,
     fetchPost,
-    onDeleteSubtask,
     handleMoveSubtask,
     _dateToString,
     _dateToAPI,
@@ -194,10 +334,11 @@ const SubtaskRow: React.FC<SubtaskRowProps> = props => {
     apiUrl,
     fetchPost,
     projectid,
+    subtaskid: data.subtaskid,
+    taskid: task && task.taskid,
     project,
     task,
-    data,
-    subtaskid: data.subtaskid
+    data
   };
   const [isHover, setIsHover] = useState<boolean>(false);
   const [{ isOver, isOverCurrent }, drop] = useDrop({
@@ -241,7 +382,7 @@ const SubtaskRow: React.FC<SubtaskRowProps> = props => {
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
-      <TableCell padding="checkbox" colSpan={2}>
+      <TableCell padding="checkbox">
         {isHover ? (
           <div ref={drag}>
             <DragIndicator
@@ -253,24 +394,23 @@ const SubtaskRow: React.FC<SubtaskRowProps> = props => {
           <div style={{ width: 24, height: 24 }} />
         )}
       </TableCell>
+      <CellStatus {...propsToCell} status={data.status} />
       <CellSubtaskName {...propsToCell} subtaskName={data.subtaskname} />
       <CellDate
         {...propsToCell}
+        {...{ _dateToString, _dateToAPI }}
         date={data.startdate}
         label="Start"
         keys="startdate"
-        _dateToString={_dateToString}
-        _dateToAPI={_dateToAPI}
       />
       <CellDate
         {...propsToCell}
+        {...{ _dateToString, _dateToAPI }}
         date={data.enddate}
         label="End"
         keys="enddate"
-        _dateToString={_dateToString}
-        _dateToAPI={_dateToAPI}
       />
-      <TableCell align="center" colSpan={4}>
+      <TableCell align="center">
         {(function() {
           const diff = _getDifferenceDate(data.startdate, data.enddate);
           const suffix =
@@ -278,18 +418,7 @@ const SubtaskRow: React.FC<SubtaskRowProps> = props => {
           return diff + suffix;
         })()}
       </TableCell>
-      <TableCell align="center">{data.note}</TableCell>
-      <TableCell padding="checkbox">
-        {isHover ? (
-          <IconButton
-            onClick={() => onDeleteSubtask({ action: "delete", item: data })}
-          >
-            <Delete />
-          </IconButton>
-        ) : (
-          <div style={{ width: 24, height: 24, padding: 12 }} />
-        )}
-      </TableCell>
+      <CellAction {...propsToCell} {...{ isHover, data }} />
     </TableRow>
   );
 };
