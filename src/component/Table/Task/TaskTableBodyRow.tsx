@@ -6,11 +6,17 @@ import { useDrag, useDrop, DropTargetMonitor } from "react-dnd";
 import AppType from "apptype";
 import { AppContext } from "../../../AppContext";
 import { grey } from "@material-ui/core/colors";
-import { DragIndicator, Delete } from "@material-ui/icons";
+import {
+  DragIndicator,
+  Delete,
+  Description,
+  NoteAdd
+} from "@material-ui/icons";
 import ItemTypes from "../ItemTypes";
 import Percent from "../../Chart/Percent";
 import CellTaskName from "./ColumnAndRow/CellTaskName";
 import CellDate from "./ColumnAndRow/CellDate";
+import CellText from "./ColumnAndRow/CellText";
 
 const SubtaskBody = Loadable({
   loader: () =>
@@ -65,7 +71,8 @@ const Task: React.FC<TaskProps & {
     _dateToAPI,
     _getDifferenceDate,
     projectid,
-    project
+    project,
+    onClickAction
   } = useContext(AppContext);
   const propsToCell: any = {
     handleLoadProjectDetail,
@@ -114,6 +121,37 @@ const Task: React.FC<TaskProps & {
     backgroundColor = isDarkMode
       ? theme.palette.grey[900]
       : theme.palette.grey[300];
+  }
+
+  function getNoteIcon() {
+    switch (true) {
+      case data.note !== null && data.note.length > 0:
+        return (
+          <Tooltip
+            title="Task note"
+            placement="top"
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <IconButton onClick={() => onClickAction("note", data)}>
+              <Description />
+            </IconButton>
+          </Tooltip>
+        );
+      default:
+        return isHover ? (
+          <Tooltip
+            title="Task note"
+            placement="top"
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <IconButton onClick={() => onClickAction("note", data)}>
+              <NoteAdd />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <div style={{ width: 24, height: 24, padding: 12 }} />
+        );
+    }
   }
 
   return (
@@ -169,29 +207,39 @@ const Task: React.FC<TaskProps & {
       <TableCell align="center">
         <Percent backgroundColor={backgroundColor} percent={taskPercent} />
       </TableCell>
-      <TableCell align="center">
-        {data.ownerlist ? data.ownerlist : "-"}
-      </TableCell>
-      <TableCell align="center">{data.contact ? data.contact : "-"}</TableCell>
-      <TableCell align="center">{data.note}</TableCell>
+      <CellText
+        {...propsToCell}
+        data={data.ownerlist}
+        label="Owner"
+        objKey="ownerlist"
+      />
+      <CellText
+        {...propsToCell}
+        data={data.contact}
+        label="Contact"
+        objKey="contact"
+      />
       <TableCell padding="checkbox">
-        {expand ? (
-          <div style={{ width: 24, height: 24, padding: 12 }} />
-        ) : isHover ? (
-          <Tooltip
-            title="Delete task"
-            placement="top"
-            classes={{ tooltip: classes.tooltip }}
-          >
-            <IconButton
-              onClick={() => onDeleteTask({ action: "delete", item: data })}
+        <div style={{ display: "flex" }}>
+          {getNoteIcon()}
+          {expand ? (
+            <div style={{ width: 24, height: 24, padding: 12 }} />
+          ) : isHover ? (
+            <Tooltip
+              title="Delete task"
+              placement="top"
+              classes={{ tooltip: classes.tooltip }}
             >
-              <Delete />
-            </IconButton>
-          </Tooltip>
-        ) : (
-          <div style={{ width: 24, height: 24, padding: 12 }} />
-        )}
+              <IconButton
+                onClick={() => onDeleteTask({ action: "delete", item: data })}
+              >
+                <Delete />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <div style={{ width: 24, height: 24, padding: 12 }} />
+          )}
+        </div>
       </TableCell>
     </TableRow>
   );

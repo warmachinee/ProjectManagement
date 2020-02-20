@@ -256,54 +256,80 @@ const CellStatus: React.FC<{ status: TaskStatus } | any> = ({
   );
 };
 
-const CellAction: React.FC<any> = ({ isHover, data }) => {
+const CellAction: React.FC<any> = ({ isHover, data, task }) => {
   const classes = useStyles();
   const { onDeleteSubtask, onClickAction } = useContext(AppContext);
   function getNoteIcon() {
     switch (true) {
       case data.note !== null && data.note.length > 0:
-        return <Description />;
-      default:
-        return <NoteAdd />;
-    }
-  }
-  return (
-    <TableCell padding="checkbox" colSpan={4}>
-      {isHover ? (
-        <div style={{ display: "flex" }}>
+        return (
           <Tooltip
             title="Note"
             placement="top"
             classes={{ tooltip: classes.tooltip }}
           >
-            <IconButton onClick={() => onClickAction("note", data)}>
-              {getNoteIcon()}
+            <IconButton
+              onClick={() => onClickAction("note", { task, subtask: data })}
+            >
+              <Description />
             </IconButton>
           </Tooltip>
+        );
+      default:
+        return isHover ? (
           <Tooltip
-            title="Cost"
-            placement="top"
-            classes={{ tooltip: classes.tooltip }}
-          >
-            <IconButton onClick={() => onClickAction("addCost", data)}>
-              <AttachMoney />
-            </IconButton>
-          </Tooltip>
-          <Tooltip
-            title="Delete subtask"
+            title="Note"
             placement="top"
             classes={{ tooltip: classes.tooltip }}
           >
             <IconButton
-              onClick={() => onDeleteSubtask({ action: "delete", item: data })}
+              onClick={() => onClickAction("note", { task, subtask: data })}
             >
-              <Delete />
+              <NoteAdd />
             </IconButton>
           </Tooltip>
-        </div>
-      ) : (
-        <div style={{ width: 24, height: 24, padding: 12 }} />
-      )}
+        ) : (
+          <div style={{ width: 24, height: 24, padding: 12 }} />
+        );
+    }
+  }
+  return (
+    <TableCell padding="checkbox" colSpan={4}>
+      <div style={{ display: "flex" }}>
+        {getNoteIcon()}
+        {isHover ? (
+          <React.Fragment>
+            <Tooltip
+              title="Cost"
+              placement="top"
+              classes={{ tooltip: classes.tooltip }}
+            >
+              <IconButton
+                onClick={() =>
+                  onClickAction("addCost", { task, subtask: data })
+                }
+              >
+                <AttachMoney />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title="Delete subtask"
+              placement="top"
+              classes={{ tooltip: classes.tooltip }}
+            >
+              <IconButton
+                onClick={() =>
+                  onDeleteSubtask({ action: "delete", item: data })
+                }
+              >
+                <Delete />
+              </IconButton>
+            </Tooltip>
+          </React.Fragment>
+        ) : (
+          <div style={{ width: 24, height: 24, padding: 12 }} />
+        )}
+      </div>
     </TableCell>
   );
 };

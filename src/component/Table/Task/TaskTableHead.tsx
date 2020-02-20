@@ -8,12 +8,11 @@ import { _getWidth } from "../../../api/Handler";
 const useStyles = makeStyles(theme => ({
   index: { ..._getWidth(36) },
   task: { ..._getWidth("25%", 300) },
-  owner: { ..._getWidth(100) },
   duration: { ..._getWidth(300) },
   date: { ..._getWidth(100) },
   percent: { ..._getWidth(120) },
-  contactPerson: { ..._getWidth(100) },
-  note: { ..._getWidth("15%", 200) }
+  owner: { ..._getWidth(150) },
+  contactPerson: { ..._getWidth(150) }
 }));
 
 export interface TaskTableHeadProps {}
@@ -48,14 +47,9 @@ const TaskTableHead: React.FC<TaskTableHeadProps> = () => {
         <StyledTableCell className={classes.percent} align="center">
           % Complete
         </StyledTableCell>
-        <StyledTableCell className={classes.owner} align="center">
-          Owner
-        </StyledTableCell>
-        <StyledTableCell className={classes.contactPerson} align="center">
+        <StyledTableCell className={classes.owner}>Owner</StyledTableCell>
+        <StyledTableCell className={classes.contactPerson}>
           Contact Person
-        </StyledTableCell>
-        <StyledTableCell className={classes.note} align="center">
-          Note
         </StyledTableCell>
         <StyledTableCell padding="checkbox"></StyledTableCell>
       </TableRow>

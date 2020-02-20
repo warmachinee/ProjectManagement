@@ -82,9 +82,19 @@ declare module "apptype" {
     | "travel";
 
   export interface CostOverview {
-    projectcost: ProjectCost &
-      ProjectInformation & { totalest: number; totalact: number };
-    detail: { type: ProjectCostType; sumest: number; sumact: number };
+    projectcost: ProjectOperation &
+      ProjectManagementFee &
+      ProjectInformation & {
+        totalest: number;
+        totalact: number;
+        projectcost: number;
+      };
+    detail: CostOverviewRow[];
+  }
+  export interface CostOverviewRow {
+    type: ProjectCostType;
+    sumest: number;
+    sumact: number;
   }
 
   /** Task */

@@ -205,6 +205,17 @@ export function _capitalizeFirstLetter(string: string) {
 /*
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
+ * Number handler function
+ */
+
+export function _checkIsNaN(value: any, newValue: any) {
+  const val: any = parseInt(value);
+  return !isNaN(val) ? val : newValue;
+}
+
+/*
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *
  * Object and Array handler function
  */
 

@@ -13,10 +13,18 @@ import { AppContext } from "../../../AppContext";
 import SubtaskRow from "./SubtaskRow";
 import CreateSubtaskRow from "./ColumnAndRow/CreateSubtaskRow";
 
-const EntertainAndTravelCost = Loadable({
+const SubtaskNote = Loadable({
   loader: () =>
     import(
-      /* webpackChunkName: 'EntertainAndTravelCost' */ "./ChildComponent/EntertainAndTravelCost"
+      /* webpackChunkName: 'SubtaskNote' */ "./ChildComponent/SubtaskNote"
+    ),
+  loading: () => null
+});
+
+const EntertainAndTravel = Loadable({
+  loader: () =>
+    import(
+      /* webpackChunkName: 'EntertainAndTravelCost' */ "../../Cost/CreateCost/EntertainAndTravel"
     ),
   loading: () => null
 });
@@ -180,7 +188,7 @@ const SubtaskBody: React.FC<SubtaskBodyProps> = ({ task, setTaskPercent }) => {
           subtaskname: "Subtask1",
           startdate: "2020-01-08T20:40:44.000Z",
           enddate: null,
-          note: null,
+          note: "This is subtask note.",
           createdate: "2020-01-08T20:40:44.000Z",
           status: "inprogress",
           cost: null
@@ -240,14 +248,16 @@ const SubtaskBody: React.FC<SubtaskBodyProps> = ({ task, setTaskPercent }) => {
           onClose={() => booleanDispatch({ type: "false", key: "note" })}
           title="Subtask note"
         >
-          Note
+          <SubtaskNote
+            {...{ handleLoadSubtask, dataOnClickAction, booleanDispatch }}
+          />
         </GeneralDialog>
         <GeneralDialog
           open={addCost}
           onClose={() => booleanDispatch({ type: "false", key: "addCost" })}
           title="Entertainment and Travel cost"
         >
-          <EntertainAndTravelCost
+          <EntertainAndTravel
             {...{
               addCost,
               handleLoadSubtask,

@@ -8,6 +8,12 @@ import TaskTableBody from "./TaskTableBody";
 import TaskTableHead from "./TaskTableHead";
 import ProjectTableDetail from "../../Project/ProjectTableDetail";
 
+const TaskNote = Loadable({
+  loader: () =>
+    import(/* webpackChunkName: 'TaskNote' */ "./ChildComponent/TaskNote"),
+  loading: () => null
+});
+
 const ProjectDetail = Loadable({
   loader: () =>
     import(
@@ -50,9 +56,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export interface ProjectTableProps {}
+export interface TaskTableProps {}
 
-const ProjectTable: React.FC<ProjectTableProps> = () => {
+const TaskTable: React.FC<TaskTableProps> = () => {
   const classes = useStyles();
   const {
     apiUrl,
@@ -62,16 +68,21 @@ const ProjectTable: React.FC<ProjectTableProps> = () => {
     useConfirmDeleteItem,
     booleanReducer
   } = useContext(AppContext);
-  const [{ editProject }, booleanDispatch] = useReducer<
+  const [{ editProject, note }, booleanDispatch] = useReducer<
     React.Reducer<AppType.BooleanReducerState, AppType.BooleanReducerActions>
   >(booleanReducer, {
-    editProject: false
+    editProject: false,
+    note: false
   });
   const [project, setProject] = useState<AppType.ProjectDetail | null>(null);
   const [
     { confirmState, item: taskOnDelete },
     onDeleteTask
   ] = useConfirmDeleteItem();
+  const [
+    dataOnClickAction,
+    setDataOnClickAction
+  ] = useState<AppType.ProjectTask | null>(null);
   const passingProps: any = {
     ...useContext(AppContext),
     project,
@@ -79,8 +90,14 @@ const ProjectTable: React.FC<ProjectTableProps> = () => {
     handleMoveTask,
     handleLoadProjectDetail,
     onDeleteTask,
-    booleanDispatch
+    booleanDispatch,
+    onClickAction
   };
+
+  function onClickAction(type: "note", data: AppType.ProjectTask) {
+    setDataOnClickAction(data);
+    booleanDispatch({ type: "true", key: type });
+  }
 
   async function handleMoveTask(
     current: AppType.ProjectTask,
@@ -355,6 +372,15 @@ const ProjectTable: React.FC<ProjectTableProps> = () => {
         >
           <ProjectDetail />
         </GeneralDialog>
+        <GeneralDialog
+          open={note}
+          onClose={() => booleanDispatch({ type: "false", key: "note" })}
+          title="Task note"
+        >
+          <TaskNote
+            {...{ handleLoadProjectDetail, dataOnClickAction, booleanDispatch }}
+          />
+        </GeneralDialog>
         <ConfirmDialog
           type="delete"
           open={confirmState}
@@ -371,4 +397,4 @@ const ProjectTable: React.FC<ProjectTableProps> = () => {
     </AppContext.Provider>
   );
 };
-export default ProjectTable;
+export default TaskTable;

@@ -35,7 +35,7 @@ const CellTaskName: React.FC<any> = ({
           onChange={e => setValue(e.target.value)}
         />
         <IconButton
-          style={{ marginTop: "auto" }}
+          style={{ marginTop: "auto", padding: 4 }}
           onClick={() => setExpand((prev: boolean) => !prev)}
         >
           {expand ? <KeyboardArrowUp /> : <KeyboardArrowDown />}

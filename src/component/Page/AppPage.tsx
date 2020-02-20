@@ -69,7 +69,7 @@ const useStyles = makeStyles(theme => ({
 
 export interface AppPageProps {}
 
-const AppPage: React.FC<AppPageProps> = props => {
+const AppPage: React.FC<AppPageProps> = React.memo(props => {
   const classes = useStyles();
   const {
     sess,
@@ -149,5 +149,5 @@ const AppPage: React.FC<AppPageProps> = props => {
       </div>
     </AppContext.Provider>
   );
-};
+});
 export default AppPage;
