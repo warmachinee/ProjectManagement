@@ -125,27 +125,29 @@ const BudgetPerson: React.FC<BudgetPersonProps> = () => {
     _totalFromArray,
     _thousandSeperater,
     sess,
-    userid
+    userid,
+    userList
   } = useContext(AppContext);
   const [data, setData] = useState<any>([]);
   const [sum, setSum] = useState(0);
   const [selectedProject, setSelectedProject] = useState<any>(null);
 
   function setChartData(d: any) {
-    const list = d.list;
+    const list = d;
+    console.log(list);
     const chartData = [];
     for (let i in list) {
-      if (list[i].projectcost) {
+      if (list[i].sumpj) {
         chartData.push({
-          id: list[i].projectname,
-          label: list[i].projectname,
-          value: list[i].projectcost,
-          status: list[i].status,
+          id: list[i].fullname,
+          label: list[i].fullname,
+          fullname: `${list[i].fullname} ${list[i].lastname}`,
+          value: list[i].sumpj,
           rawData: list[i]
         });
       }
     }
-    const thisSum = d.totalcost;
+    const thisSum = _totalFromArray(d, "sumpj");
     setData(
       chartData.filter((f: any) => {
         return Boolean(parseFloat(((f.value / thisSum) * 100).toFixed(1)));
@@ -154,74 +156,16 @@ const BudgetPerson: React.FC<BudgetPersonProps> = () => {
     setSum(thisSum);
   }
 
-  async function handleLoadProject() {
-    const response: AppType.ProjectTable = await fetchPost({
-      url: apiUrl("loadproject"),
-      body: {
-        action: "list",
-        ...(sess.type === "manager" && userid && { userid })
-      }
-    });
-    setChartData(response);
-  }
-
-  function handleFetchTemp() {
-    const thisData = {
-      list: [
-        {
-          projectid: 7558969,
-          sequence: 2,
-          projectname: "IT Project",
-          stage_current: 1,
-          startdate: null,
-          enddate: null,
-          projectcost: 0,
-          status: "inprogress"
-        },
-        {
-          projectid: 6622391,
-          sequence: 3,
-          projectname: "Task Management",
-          stage_current: 1,
-          startdate: null,
-          enddate: null,
-          projectcost: 0,
-          status: "inprogress"
-        },
-        {
-          projectid: 9422312,
-          sequence: 3,
-          projectname: "Energy Project",
-          stage_current: 1,
-          startdate: "2020-01-11T17:00:00.000Z",
-          enddate: "2020-03-04T17:00:00.000Z",
-          projectcost: 20000000,
-          status: "inprogress"
-        },
-        {
-          projectid: 6847487,
-          sequence: 4,
-          projectname: "Smart farm",
-          stage_current: 1,
-          startdate: null,
-          enddate: null,
-          projectcost: 0,
-          status: "inprogress"
-        }
-      ],
-      totalcost: 20000000
-    };
-    setChartData(thisData);
-  }
-
   useEffect(() => {
-    _onLocalhostFn(handleFetchTemp, handleLoadProject);
-  }, []);
+    if (userList) {
+      setChartData(userList);
+    }
+  }, [userList]);
 
   return (
     <Paper elevation={2} className={classes.root}>
       <Typography variant="h6" align="center">
-        Budget-Project
+        Budget-Person
       </Typography>
       <div className={classes.chart}>
         {data && (
@@ -248,24 +192,46 @@ const BudgetPerson: React.FC<BudgetPersonProps> = () => {
             animate={true}
             motionStiffness={90}
             motionDamping={15}
-            defs={defs}
-            fill={data.map((d: any) => {
-              return getStatus(d);
-            })}
             tooltip={d => {
-              return <ChartTooltip data={d} />;
+              return (
+                <ChartTooltip
+                  data={{
+                    label: d.fullname,
+                    value: d.value
+                  }}
+                />
+              );
             }}
             theme={chartTheme}
             onClick={d => setSelectedProject(d.rawData)}
+            legends={[
+              {
+                anchor: "right",
+                direction: "column",
+                translateX: 0,
+                itemWidth: 100,
+                itemHeight: 36,
+                itemTextColor: theme.palette.text.primary,
+                symbolSize: 18,
+                symbolShape: "circle"
+              }
+            ]}
           />
         )}
       </div>
-      <div className={classes.legends}>
-        <DotLegends label="Inprogress" backgroundColor={amber[600]} />
-        {/* <DotLegends label="PM" backgroundColor={blue[600]} /> */}
-        <DotLegends label="Complete" backgroundColor={green[600]} />
-        <DotLegends label="Fail" backgroundColor={red[600]} />
-      </div>
+      {sum && (
+        <div className={classes.legends}>
+          <Typography variant="body1" style={{ marginRight: 16 }}>
+            Total Budget
+          </Typography>
+          <Typography
+            variant="body1"
+            style={{ color: theme.palette.grey[900], fontWeight: 700 }}
+          >
+            {_thousandSeperater(sum)} ฿
+          </Typography>
+        </div>
+      )}
     </Paper>
   );
 };

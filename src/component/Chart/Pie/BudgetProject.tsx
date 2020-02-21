@@ -19,9 +19,7 @@ const useStyles = makeStyles(theme => ({
   legends: {
     position: "absolute",
     bottom: 16,
-    width: `calc(100% - ${chartRect.padding * 2}px)`,
-    display: "flex",
-    justifyContent: "center"
+    width: `calc(100% - ${chartRect.padding * 2}px)`
   }
 }));
 
@@ -82,7 +80,6 @@ function getStatus(data: any) {
     case "fail":
       variant = "fail";
       break;
-    case "pending":
     case "inprogress":
       variant = "inprogress";
       break;
@@ -196,7 +193,7 @@ const BudgetProject: React.FC<BudgetProjectProps> = () => {
           startdate: "2020-01-11T17:00:00.000Z",
           enddate: "2020-03-04T17:00:00.000Z",
           projectcost: 20000000,
-          status: "inprogress"
+          status: "pending"
         },
         {
           projectid: 6847487,
@@ -230,7 +227,7 @@ const BudgetProject: React.FC<BudgetProjectProps> = () => {
             sortByValue={true}
             radialLabel={d => `${d.id}`}
             sliceLabel={d => `${((d.value / sum) * 100).toFixed(0)}%`}
-            margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
+            margin={{ top: 40, right: 80, bottom: 120, left: 80 }}
             innerRadius={0.5}
             padAngle={0.7}
             cornerRadius={3}
@@ -261,10 +258,27 @@ const BudgetProject: React.FC<BudgetProjectProps> = () => {
         )}
       </div>
       <div className={classes.legends}>
-        <DotLegends label="Inprogress" backgroundColor={amber[600]} />
-        {/* <DotLegends label="PM" backgroundColor={blue[600]} /> */}
-        <DotLegends label="Complete" backgroundColor={green[600]} />
-        <DotLegends label="Fail" backgroundColor={red[600]} />
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <DotLegends label="Inprogress" backgroundColor={amber[400]} />
+          <DotLegends label="Pending" backgroundColor={grey[400]} />
+          <DotLegends label="Complete" backgroundColor={green[400]} />
+          <DotLegends label="Fail" backgroundColor={red[400]} />
+        </div>
+        {sum && (
+          <div
+            style={{ display: "flex", justifyContent: "center", marginTop: 16 }}
+          >
+            <Typography variant="body1" style={{ marginRight: 16 }}>
+              Total Budget
+            </Typography>
+            <Typography
+              variant="body1"
+              style={{ color: theme.palette.grey[900], fontWeight: 700 }}
+            >
+              {_thousandSeperater(sum)} ฿
+            </Typography>
+          </div>
+        )}
       </div>
     </Paper>
   );

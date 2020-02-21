@@ -10,7 +10,20 @@ import {
   BarChart
 } from "@material-ui/icons";
 import { ButtonGroup, Button } from "@material-ui/core";
-import EstimateActual from "../Chart/Bar/EstimateActual";
+
+const EstimateActual = Loadable({
+  loader: () =>
+    import(
+      /* webpackChunkName: 'EstimateActual' */ "../Chart/Bar/EstimateActual"
+    ),
+  loading: () => null
+});
+
+const BudgetCost = Loadable({
+  loader: () =>
+    import(/* webpackChunkName: 'BudgetCost' */ "../Chart/Pie/BudgetCost"),
+  loading: () => null
+});
 
 const TaskTable = Loadable({
   loader: () =>
@@ -118,6 +131,7 @@ const DefaultComponent: React.FC = () => {
         return (
           <div>
             <EstimateActual />
+            <BudgetCost />
           </div>
         );
       default:

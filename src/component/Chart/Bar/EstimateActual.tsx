@@ -1,23 +1,11 @@
 import React, { useState, useContext, useEffect } from "react";
-import { ResponsivePie } from "@nivo/pie";
 import { ResponsiveBar } from "@nivo/bar";
-import { green, red, grey, blue } from "@material-ui/core/colors";
+import { green, red, blue } from "@material-ui/core/colors";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
-import {
-  Typography,
-  Paper,
-  Button,
-  IconButton,
-  ListItemText
-} from "@material-ui/core";
+import { Typography, Paper, Button } from "@material-ui/core";
 import { AppContext } from "../../../AppContext";
 import AppType from "apptype";
-import {
-  InsertChart,
-  BarChart,
-  PieChart,
-  PieChartOutlined
-} from "@material-ui/icons";
+import { InsertChart, BarChart } from "@material-ui/icons";
 import ChartTooltip from "../ChartTooltip";
 
 const chartRect = { width: 600, height: 400, padding: 16 };
@@ -41,107 +29,6 @@ const useStyles = makeStyles(theme => ({
 
 export interface EstimateActualProps {}
 
-const defs = [
-  {
-    id: "cost",
-    type: "patternDots",
-    color: red[400],
-    size: 1,
-    padding: 0
-  },
-  {
-    id: "profit",
-    type: "patternDots",
-    color: green[400],
-    size: 1,
-    padding: 0
-  },
-  {
-    id: "remain",
-    type: "patternDots",
-    color: grey[400],
-    size: 1,
-    padding: 0
-  }
-];
-
-const chartTheme = {
-  legends: {
-    text: {
-      fontSize: 16,
-      fontFamily: "Roboto"
-    }
-  },
-  labels: {
-    text: {
-      fontSize: 14,
-      fontFamily: "Roboto"
-    }
-  }
-};
-
-function getCostStatus(data: any) {
-  let variant = "";
-  switch (data.status) {
-    case "cost":
-      variant = "cost";
-      break;
-    case "profit":
-      variant = "profit";
-      break;
-    case "remain":
-      variant = "remain";
-      break;
-    default:
-      variant = "remain";
-  }
-  return {
-    match: {
-      id: data.id
-    },
-    id: variant
-  };
-}
-
-function getStatus(data: any) {
-  let variant = "";
-  switch (data.status) {
-    case "complete":
-      variant = "complete";
-      break;
-    case "fail":
-      variant = "fail";
-      break;
-  }
-  return {
-    match: {
-      id: data.id
-    },
-    id: variant
-  };
-}
-
-const DotLegends: React.FC<any> = ({
-  backgroundColor,
-  label,
-  secondaryLabel
-}) => {
-  return (
-    <div style={{ alignItems: "center", display: "flex", marginRight: 16 }}>
-      <div
-        style={{
-          height: 16,
-          width: 16,
-          borderRadius: "50%",
-          backgroundColor,
-          marginRight: 8
-        }}
-      />
-      <ListItemText primary={label} secondary={secondaryLabel} />
-    </div>
-  );
-};
-
 const EstimateActual: React.FC<EstimateActualProps> = () => {
   const classes = useStyles();
   const theme = useTheme();
@@ -152,16 +39,22 @@ const EstimateActual: React.FC<EstimateActualProps> = () => {
     _onLocalhostFn,
     _thousandSeperater,
     _totalFromArray,
-    _totalFromArrayObj,
     _capitalizeFirstLetter,
     sess,
     userid
   } = useContext(AppContext);
   const [groupMode, setGroupMode] = useState(false);
-  const [pieMode, setPieMode] = useState(false);
-  const [costData, setCostData] = useState<any | null>(null);
   const [data, setData] = useState<any | null>([]);
-  const [sum, setSum] = useState(0);
+  const chartTheme = {
+    axis: {
+      ticks: {
+        text: {
+          fill: theme.palette.text.primary,
+          fontSize: 14
+        }
+      }
+    }
+  };
 
   function setChartData(d: any) {
     const list = d.detail;
@@ -178,89 +71,6 @@ const EstimateActual: React.FC<EstimateActualProps> = () => {
       });
     }
     setData(thisChartData);
-    const thisPieChartData = [];
-    for (let i in list) {
-      if (list[i].sumact) {
-        if (list[i].type !== "managementfee") {
-          thisPieChartData.push({
-            id: list[i].type,
-            label: _capitalizeFirstLetter(list[i].type),
-            value: list[i].sumact,
-            estimate: list[i].sumest,
-            status: "cost",
-            rawData: list[i]
-          });
-        }
-      }
-    }
-    if (d.projectcost.op) {
-      thisPieChartData.push({
-        id: "Operation",
-        label: "Operation",
-        value: d.projectcost.op,
-        estimate: d.projectcost.op,
-        status: "cost",
-        rawData: d.projectcost.op
-      });
-    }
-    const realMF = list.filter((item: any) => item.type === "managementfee")[0];
-    if (realMF.sumact) {
-      thisPieChartData.push({
-        id: "Management Fee",
-        label: "Management Fee",
-        value: realMF.sumact,
-        estimate: realMF.sumact,
-        status: "cost",
-        rawData: realMF.sumact
-      });
-    }
-    if (d.projectcost.mf) {
-      thisPieChartData.push({
-        id: `Management Fee ${
-          realMF.sumact < d.projectcost.mf ? "Profit" : "Loss"
-        }`,
-        label: `Management Fee ${
-          realMF.sumact < d.projectcost.mf ? "Profit" : "Loss"
-        }`,
-        value: Math.abs(realMF.sumact - d.projectcost.mf),
-        estimate: Math.abs(realMF.sumact - d.projectcost.mf),
-        status: realMF.sumact < d.projectcost.mf ? "profit" : "cost",
-        rawData: Math.abs(realMF.sumact - d.projectcost.mf)
-      });
-    }
-
-    if (d.projectcost.guarantee_percent) {
-      thisPieChartData.push({
-        id: "Guarantee",
-        label: "Guarantee",
-        value:
-          (d.projectcost.guarantee_percent * d.projectcost.projectcost) / 100,
-        estimate:
-          (d.projectcost.guarantee_percent * d.projectcost.projectcost) / 100,
-        status: "profit",
-        rawData:
-          (d.projectcost.guarantee_percent * d.projectcost.projectcost) / 100
-      });
-    }
-
-    thisPieChartData.push({
-      id: "Profit",
-      label: "Profit",
-      value:
-        d.projectcost.projectcost - _totalFromArray(thisPieChartData, "value"),
-      estimate:
-        d.projectcost.projectcost - _totalFromArray(thisPieChartData, "value"),
-      status: "profit",
-      rawData:
-        d.projectcost.projectcost - _totalFromArray(thisPieChartData, "value")
-    });
-    const thisSum = _totalFromArray(thisPieChartData, "value");
-    setCostData(
-      thisPieChartData.filter((f: any) => {
-        return Boolean(parseFloat(((f.value / thisSum) * 100).toFixed(1)));
-      })
-    );
-    setSum(thisSum);
   }
 
   async function handleLoadCost() {
@@ -351,6 +161,7 @@ const EstimateActual: React.FC<EstimateActualProps> = () => {
             groupMode={groupMode ? "stacked" : "grouped"}
             borderRadius={2}
             borderColor={theme.palette.text.primary}
+            minValue={100}
             axisTop={null}
             axisRight={null}
             axisBottom={{
@@ -371,16 +182,7 @@ const EstimateActual: React.FC<EstimateActualProps> = () => {
               legendOffset: -40,
               format: value => `${_thousandSeperater(value)} ฿`
             }}
-            theme={{
-              axis: {
-                ticks: {
-                  text: {
-                    fill: theme.palette.text.primary,
-                    fontSize: 14
-                  }
-                }
-              }
-            }}
+            theme={chartTheme}
             enableLabel={false}
             labelSkipWidth={12}
             labelSkipHeight={12}
@@ -423,97 +225,6 @@ const EstimateActual: React.FC<EstimateActualProps> = () => {
           />
         )}
       </div>
-      {/* <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <Button
-          color="primary"
-          variant="outlined"
-          size="large"
-          onClick={() => setPieMode((prev: any) => !prev)}
-          startIcon={
-            pieMode ? (
-              <PieChartOutlined fontSize="large" />
-            ) : (
-              <PieChart fontSize="large" />
-            )
-          }
-        >
-          Toggle
-        </Button>
-      </div> */}
-
-      <div className={classes.pieChart}>
-        {costData && (
-          <ResponsivePie
-            data={costData}
-            radialLabel={d => `${d.label}`}
-            sliceLabel={d => `${((d.value / sum) * 100).toFixed(1)}%`}
-            margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
-            innerRadius={0.5}
-            padAngle={0.7}
-            cornerRadius={3}
-            borderWidth={1}
-            borderColor={{ theme: "grid.line.stroke" }}
-            radialLabelsSkipAngle={10}
-            radialLabelsTextXOffset={6}
-            radialLabelsTextColor={theme.palette.text.primary}
-            radialLabelsLinkOffset={0}
-            radialLabelsLinkDiagonalLength={16}
-            radialLabelsLinkHorizontalLength={24}
-            radialLabelsLinkStrokeWidth={1}
-            radialLabelsLinkColor={theme.palette.text.primary}
-            slicesLabelsTextColor={grey[900]}
-            animate={true}
-            motionStiffness={90}
-            motionDamping={15}
-            defs={defs}
-            fill={costData.map((d: any) => {
-              return getCostStatus(d);
-            })}
-            tooltip={d => {
-              return <ChartTooltip data={d} />;
-            }}
-            theme={chartTheme}
-          />
-        )}
-      </div>
-      {costData && sum && (
-        <div className={classes.legends}>
-          <DotLegends
-            label={`Cost (${(
-              (_totalFromArrayObj(costData, "value", {
-                key: "status",
-                value: "cost"
-              }) /
-                sum) *
-              100
-            ).toFixed(1)})%`}
-            secondaryLabel={`${_thousandSeperater(
-              _totalFromArrayObj(costData, "value", {
-                key: "status",
-                value: "cost"
-              })
-            )}฿`}
-            backgroundColor={red[600]}
-          />
-          <DotLegends
-            label={`Profit (${(
-              (_totalFromArrayObj(costData, "value", {
-                key: "status",
-                value: "profit"
-              }) /
-                sum) *
-              100
-            ).toFixed(1)})%`}
-            secondaryLabel={`${_thousandSeperater(
-              _totalFromArrayObj(costData, "value", {
-                key: "status",
-                value: "profit"
-              })
-            )}฿`}
-            backgroundColor={green[600]}
-          />
-        </div>
-      )}
     </Paper>
   );
 };

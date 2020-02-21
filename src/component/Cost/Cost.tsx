@@ -88,7 +88,7 @@ const costTypeArr = [
 
 const CostController: React.FC<any> = ({ create, costType, setCostType }) => {
   const classes = useStyles();
-  const { booleanDispatch } = useContext(AppContext);
+  const { booleanDispatch, sess } = useContext(AppContext);
 
   return (
     <Toolbar className={classes.tableToolbar}>
@@ -104,7 +104,8 @@ const CostController: React.FC<any> = ({ create, costType, setCostType }) => {
           />
         ))}
         <div style={{ marginTop: 16, padding: "4px 0" }}>
-          {costType !== "overview" &&
+          {sess.type === "user" &&
+            costType !== "overview" &&
             costType !== "entertain" &&
             costType !== "travel" && (
               <Button
@@ -214,9 +215,7 @@ const Cost: React.FC<CostProps> = ({ setMaxWidth }) => {
   return (
     <AppContext.Provider value={passingProps}>
       <Paper elevation={2}>
-        {sess.type === "user" && (
-          <CostController {...{ create, costType, setCostType }} />
-        )}
+        <CostController {...{ create, costType, setCostType }} />
         {getComponent()}
       </Paper>
       <GeneralDialog

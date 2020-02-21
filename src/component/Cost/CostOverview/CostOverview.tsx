@@ -12,9 +12,14 @@ export interface CostOverviewProps {}
 
 const CostOverview: React.FC<CostOverviewProps> = () => {
   const classes = useStyles();
-  const { apiUrl, fetchPost, _onLocalhostFn, projectid } = useContext(
-    AppContext
-  );
+  const {
+    apiUrl,
+    fetchPost,
+    _onLocalhostFn,
+    projectid,
+    sess,
+    userid
+  } = useContext(AppContext);
   const [costOverview, setCostOverview] = useState<AppType.CostOverview | null>(
     null
   );
@@ -28,7 +33,11 @@ const CostOverview: React.FC<CostOverviewProps> = () => {
   async function handleLoadCostOverview() {
     const response: any | AppType.CostOverview = await fetchPost({
       url: apiUrl("loadproject"),
-      body: { action: "costoverview", projectid }
+      body: {
+        action: "costoverview",
+        projectid,
+        ...(sess.type === "manager" && userid && { userid })
+      }
     });
     setCostOverview(response);
   }

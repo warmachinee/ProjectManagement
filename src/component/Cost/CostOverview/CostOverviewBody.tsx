@@ -1,8 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { TableBody, TableRow, TableCell, Button } from "@material-ui/core";
+import { TableBody, TableRow, TableCell } from "@material-ui/core";
 import { AppContext } from "../../../AppContext";
 import AppType from "apptype";
+import CostOverviewBodyRow from "./CostOverviewBodyRow";
 
 const useStyles = makeStyles(theme => ({}));
 
@@ -16,34 +17,12 @@ const CostOverviewBody: React.FC<CostOverviewBodyProps> = () => {
     _totalFromArray,
     setCostType
   } = useContext(AppContext);
-
   return (
     <TableBody>
       {costOverview && (
         <React.Fragment>
           {costOverview.detail.map((d: AppType.CostOverviewRow, i: number) => {
-            return (
-              <TableRow key={i}>
-                <TableCell />
-                <TableCell align="right">{i + 1}</TableCell>
-                <TableCell>
-                  <Button
-                    onClick={() => setCostType(d.type)}
-                    style={{ textTransform: "capitalize" }}
-                    color="primary"
-                  >
-                    {d.type === "managementfee" ? "Management Fee" : d.type}
-                  </Button>
-                </TableCell>
-                <TableCell align="right">
-                  {_thousandSeperater(d.sumest)}
-                </TableCell>
-                <TableCell align="right">
-                  {_thousandSeperater(d.sumact)}
-                </TableCell>
-                <TableCell />
-              </TableRow>
-            );
+            return <CostOverviewBodyRow key={i} data={d} index={i} />;
           })}
           <TableRow>
             <TableCell colSpan={2} />

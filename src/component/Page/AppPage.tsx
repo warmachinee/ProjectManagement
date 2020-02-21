@@ -159,7 +159,7 @@ const AppPage: React.FC<AppPageProps> = React.memo(props => {
           )}
           <MenuItem onClick={handleLogout}>Logout</MenuItem>
         </Menu>
-        {!isAuth && <Redirect to="/" />}
+        {/* {!isAuth && <Redirect to="/" />} */}
       </div>
     </AppContext.Provider>
   );

@@ -75,12 +75,10 @@ const EntertainAndTravel: React.FC<{ [keys: string]: any }> = props => {
           autoOk
           fullWidth
           className={classes.costTextField}
-          variant="inline"
           inputVariant="outlined"
           label="Date"
           value={setupdate}
           onChange={(d: any) => setSetupdate(d ? new Date(d) : d)}
-          views={["year", "month", "date"]}
         />
       </div>
       <TextField

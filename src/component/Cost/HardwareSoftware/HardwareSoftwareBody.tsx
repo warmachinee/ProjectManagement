@@ -55,7 +55,7 @@ const HardwareSoftwareBody: React.FC<HardwareSoftwareBodyProps> = () => {
           ))}
           <TableRow>
             <TableCell colSpan={2} />
-            <TableCell style={{ fontWeight: 900 }} colSpan={3}>
+            <TableCell style={{ fontWeight: 900 }} colSpan={4}>
               Total
             </TableCell>
             <TableCell align="right" style={{ fontWeight: 900 }}>

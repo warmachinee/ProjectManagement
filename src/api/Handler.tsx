@@ -191,7 +191,10 @@ export function _getWidth(
  */
 
 export function _thousandSeperater(number: number) {
-  return number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+  if (number) {
+    return number.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+  }
+  return "0";
 }
 
 export function _capitalizeFirstLetter(string: string) {

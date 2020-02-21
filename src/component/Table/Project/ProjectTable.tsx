@@ -288,17 +288,19 @@ const ProjectTable: React.FC<ProjectTableProps> = () => {
         <Typography variant="h5" style={{ paddingTop: 16 }}>
           Project
         </Typography>
-        <div style={{ display: "flex", width: "100%", padding: "8px 0" }}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() =>
-              booleanDispatch({ type: "true", key: "createProject" })
-            }
-          >
-            Add Project
-          </Button>
-        </div>
+        {sess.type === "user" && (
+          <div style={{ display: "flex", width: "100%", padding: "8px 0" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() =>
+                booleanDispatch({ type: "true", key: "createProject" })
+              }
+            >
+              Add Project
+            </Button>
+          </div>
+        )}
       </Toolbar>
     );
   };
