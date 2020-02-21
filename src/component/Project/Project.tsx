@@ -109,10 +109,7 @@ const PageMenu: React.FC<{
 
 const DefaultComponent: React.FC = () => {
   const classes = useStyles();
-  const { _onLocalhost } = useContext(AppContext);
-  const [page, setPage] = React.useState<string | null>(
-    _onLocalhost("chart", "task")
-  );
+  const [page, setPage] = React.useState<string | null>("task");
   const [maxWidth, setMaxWidth] = React.useState<any | null>(1200);
 
   function changePage(p: string) {

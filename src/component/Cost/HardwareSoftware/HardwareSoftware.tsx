@@ -25,7 +25,7 @@ const HardwareSoftware: React.FC<HardwareSoftwareProps> = ({ costType }) => {
   const {
     apiUrl,
     fetchPost,
-    _onLocalhostFn,
+
     projectid,
     useConfirmDeleteItem,
     setCostData,
@@ -77,67 +77,8 @@ const HardwareSoftware: React.FC<HardwareSoftwareProps> = ({ costType }) => {
     await handleLoadCost();
   }
 
-  function handleFetchTemp() {
-    setCostData([
-      {
-        costid: 2275482,
-        content: "Server",
-        estimate_value: 525000,
-        actual_value: 20000,
-        unit: "",
-        amount: 0,
-        price: 0
-      },
-      {
-        costid: 8512603,
-        content: "HDD",
-        estimate_value: 52500,
-        actual_value: 52000,
-        unit: "",
-        amount: 0,
-        price: 0
-      },
-      {
-        costid: 2091955,
-        content: "Monitor",
-        estimate_value: 72000,
-        actual_value: 70500,
-        unit: "",
-        amount: 0,
-        price: 0
-      },
-      {
-        costid: 6964514,
-        content: "Mouse",
-        estimate_value: 32500,
-        actual_value: 31000,
-        unit: "",
-        amount: 0,
-        price: 0
-      },
-      {
-        costid: 6950358,
-        content: "MAC Book",
-        estimate_value: 250000,
-        actual_value: 245000,
-        unit: "",
-        amount: 0,
-        price: 0
-      },
-      {
-        costid: 4409256,
-        content: "PC",
-        estimate_value: 315000,
-        actual_value: 300000,
-        unit: "",
-        amount: 0,
-        price: 0
-      }
-    ]);
-  }
-
   useEffect(() => {
-    _onLocalhostFn(handleFetchTemp, handleLoadCost);
+    handleLoadCost();
   }, [costType]);
 
   return (

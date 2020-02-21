@@ -22,7 +22,7 @@ export interface UnderlingProps {}
 
 const Underling: React.FC<UnderlingProps> = () => {
   const classes = useStyles();
-  const { apiUrl, fetchPost, _onLocalhostFn } = useContext(AppContext);
+  const { apiUrl, fetchPost } = useContext(AppContext);
   const [userList, setUserList] = useState<any | null>(null);
   const passingProps: any = {
     ...useContext(AppContext),
@@ -38,53 +38,8 @@ const Underling: React.FC<UnderlingProps> = () => {
     setUserList(response);
   }
 
-  function handleFetchTemp() {
-    setUserList([
-      {
-        userid: 23437,
-        displayname: null,
-        fullname: "tha",
-        lastname: "watck",
-        photopath: null,
-        sumpj: 76800000
-      },
-      {
-        userid: 36720,
-        displayname: "PREMio",
-        fullname: "Sippakorn",
-        lastname: "Suphapinyo",
-        photopath: null,
-        sumpj: 123250000
-      },
-      {
-        userid: 65317,
-        displayname: null,
-        fullname: "apirach",
-        lastname: "supattaratprateep",
-        photopath: null,
-        sumpj: 0
-      },
-      {
-        userid: 98585,
-        displayname: "catty",
-        fullname: "KLx",
-        lastname: "Hunter",
-        photopath: null,
-        sumpj: 95000000
-      },
-      {
-        userid: 98842,
-        displayname: null,
-        fullname: "noppong",
-        lastname: "chareunsook",
-        photopath: null,
-        sumpj: 130350000
-      }
-    ]);
-  }
-
   useEffect(() => {
-    _onLocalhostFn(handleFetchTemp, handleLoadUnderling);
+    handleLoadUnderling();
   }, []);
 
   return (

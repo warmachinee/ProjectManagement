@@ -55,7 +55,7 @@ const SubtaskBody: React.FC<SubtaskBodyProps> = ({ task, setTaskPercent }) => {
     apiUrl,
     fetchPost,
     projectid,
-    _onLocalhostFn,
+
     _onEnter,
     useConfirmDeleteItem,
     booleanReducer
@@ -178,38 +178,8 @@ const SubtaskBody: React.FC<SubtaskBodyProps> = ({ task, setTaskPercent }) => {
     setTaskPercent(response.percent);
   }
 
-  function handleFetchTemp() {
-    setData({
-      percent: 0,
-      list: [
-        {
-          subtaskid: 889274205,
-          sequence: 1,
-          subtaskname: "Subtask1",
-          startdate: "2020-01-08T20:40:44.000Z",
-          enddate: null,
-          note: "This is subtask note.",
-          createdate: "2020-01-08T20:40:44.000Z",
-          status: "inprogress",
-          cost: null
-        },
-        {
-          subtaskid: 985781309,
-          sequence: 2,
-          subtaskname: "Subtask2",
-          startdate: null,
-          enddate: null,
-          note: null,
-          createdate: "2020-02-18T20:48:58.000Z",
-          status: "inprogress",
-          cost: null
-        }
-      ]
-    });
-  }
-
   useEffect(() => {
-    _onLocalhostFn(handleFetchTemp, handleLoadSubtask);
+    handleLoadSubtask();
   }, []);
 
   return (

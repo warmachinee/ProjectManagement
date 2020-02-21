@@ -121,7 +121,7 @@ const BudgetPerson: React.FC<BudgetPersonProps> = () => {
   const {
     apiUrl,
     fetchPost,
-    _onLocalhostFn,
+
     _totalFromArray,
     _thousandSeperater,
     sess,

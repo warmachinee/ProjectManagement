@@ -25,7 +25,7 @@ const EntertainTravel: React.FC<EntertainTravelProps> = ({ costType }) => {
   const {
     apiUrl,
     fetchPost,
-    _onLocalhostFn,
+
     projectid,
     useConfirmDeleteItem,
     setCostData,
@@ -77,22 +77,8 @@ const EntertainTravel: React.FC<EntertainTravelProps> = ({ costType }) => {
     await handleLoadCost();
   }
 
-  function handleFetchTemp() {
-    setCostData([
-      {
-        costid: 7189580,
-        sequence: 1,
-        typecost: "entertain",
-        content: "Dinner",
-        subtaskid: 0,
-        value: 3500,
-        setupdate: "2020-02-20T17:00:00.000Z"
-      }
-    ]);
-  }
-
   useEffect(() => {
-    _onLocalhostFn(handleFetchTemp, handleLoadCost);
+    handleLoadCost();
   }, [costType]);
 
   return (

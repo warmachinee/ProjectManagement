@@ -131,7 +131,7 @@ const BudgetCost: React.FC<BudgetCostProps> = () => {
     apiUrl,
     fetchPost,
     projectid,
-    _onLocalhostFn,
+
     _thousandSeperater,
     _totalFromArray,
     _totalFromArrayObj,
@@ -200,7 +200,7 @@ const BudgetCost: React.FC<BudgetCostProps> = () => {
 
   function setChartData(d: any) {
     const list = d.detail;
-    const thisPieChartData = [];
+    let thisPieChartData = [];
     const keys = pieMode ? "sumest" : "sumact";
     for (let i in list) {
       if (list[i][keys]) {
@@ -243,13 +243,15 @@ const BudgetCost: React.FC<BudgetCostProps> = () => {
         status: realMF[keys] < d.projectcost.mf ? "profit" : "cost"
       });
     }
-    const thisSum = _totalFromArray(thisPieChartData, "value");
-    const thisProfit = d.projectcost.projectcost - thisSum;
+    const thisProfit =
+      d.projectcost.projectcost - _totalFromArray(thisPieChartData, "value");
     if (thisProfit > 0) {
       thisPieChartData.push({
         id: "Profit",
         label: "Profit",
-        value: d.projectcost.projectcost - thisSum,
+        value:
+          d.projectcost.projectcost -
+          _totalFromArray(thisPieChartData, "value"),
         status: "profit"
       });
       if (d.projectcost.guarantee_percent) {
@@ -262,10 +264,16 @@ const BudgetCost: React.FC<BudgetCostProps> = () => {
         });
       }
     }
+    const thisSum = _totalFromArray(thisPieChartData, "value");
+    const lastArrData = thisPieChartData.filter((f: any) => {
+      return Boolean(parseFloat(((f.value / thisSum) * 100).toFixed(1)));
+    });
     setCostData(
-      thisPieChartData.filter((f: any) => {
-        return Boolean(parseFloat(((f.value / thisSum) * 100).toFixed(1)));
-      })
+      thisProfit < 0
+        ? lastArrData.map(d => {
+            return { ...d, status: "cost" };
+          })
+        : lastArrData
     );
     setCostSum(thisSum);
     setCostProfit(thisProfit);
@@ -284,42 +292,8 @@ const BudgetCost: React.FC<BudgetCostProps> = () => {
     setData(response);
   }
 
-  function handleFetchTemp() {
-    const thisData = {
-      projectcost: {
-        projectid: 9422312,
-        projectname: "Energy Project",
-        projectcost: 27000000,
-        op: 2349000,
-        op_percent: 8.7,
-        mf: 1350000,
-        mf_percent: 5,
-        guarantee_percent: 5,
-        guarantee_period: 0,
-        contractbegin: "2020-02-28T17:00:00.000Z",
-        ownername: "EGAT",
-        entertain_est: 2000000,
-        travel_est: 750000,
-        totalest: 23820000,
-        totalact: 17432500
-      },
-      detail: [
-        { type: "hardware", sumest: 1310500, sumact: 1015500 },
-        { type: "software", sumest: 3024500, sumact: 2522000 },
-        { type: "customization", sumest: 12360000, sumact: 10000000 },
-        { type: "training", sumest: 1260000, sumact: 1200000 },
-        { type: "managementfee", sumest: 3010000, sumact: 2595000 },
-        { type: "entertain", sumest: 2000000, sumact: 0 },
-        { type: "travel", sumest: 750000, sumact: 0 },
-        { type: "other", sumest: 105000, sumact: 100000 }
-      ]
-    };
-    setChartData(thisData);
-    setData(thisData);
-  }
-
   useEffect(() => {
-    _onLocalhostFn(handleFetchTemp, handleLoadCost);
+    handleLoadCost();
   }, []);
 
   useEffect(() => {

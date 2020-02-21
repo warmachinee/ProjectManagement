@@ -25,7 +25,7 @@ const ManagementFee: React.FC<ManagementFeeProps> = ({ costType }) => {
   const {
     apiUrl,
     fetchPost,
-    _onLocalhostFn,
+
     projectid,
     useConfirmDeleteItem,
     setCostData,
@@ -77,20 +77,8 @@ const ManagementFee: React.FC<ManagementFeeProps> = ({ costType }) => {
     await handleLoadCost();
   }
 
-  function handleFetchTemp() {
-    setCostData([
-      {
-        costid: 5576024,
-        sequence: 1,
-        content: "Mr.A",
-        estimate_value: 250000,
-        actual_value: 0
-      }
-    ]);
-  }
-
   useEffect(() => {
-    _onLocalhostFn(handleFetchTemp, handleLoadCost);
+    handleLoadCost();
   }, [costType]);
 
   return (

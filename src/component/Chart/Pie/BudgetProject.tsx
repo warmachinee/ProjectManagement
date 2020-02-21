@@ -118,7 +118,6 @@ const BudgetProject: React.FC<BudgetProjectProps> = () => {
   const {
     apiUrl,
     fetchPost,
-    _onLocalhostFn,
     _totalFromArray,
     _thousandSeperater,
     sess,
@@ -162,57 +161,8 @@ const BudgetProject: React.FC<BudgetProjectProps> = () => {
     setChartData(response);
   }
 
-  function handleFetchTemp() {
-    const thisData = {
-      list: [
-        {
-          projectid: 7558969,
-          sequence: 2,
-          projectname: "IT Project",
-          stage_current: 1,
-          startdate: null,
-          enddate: null,
-          projectcost: 0,
-          status: "inprogress"
-        },
-        {
-          projectid: 6622391,
-          sequence: 3,
-          projectname: "Task Management",
-          stage_current: 1,
-          startdate: null,
-          enddate: null,
-          projectcost: 0,
-          status: "inprogress"
-        },
-        {
-          projectid: 9422312,
-          sequence: 3,
-          projectname: "Energy Project",
-          stage_current: 1,
-          startdate: "2020-01-11T17:00:00.000Z",
-          enddate: "2020-03-04T17:00:00.000Z",
-          projectcost: 20000000,
-          status: "pending"
-        },
-        {
-          projectid: 6847487,
-          sequence: 4,
-          projectname: "Smart farm",
-          stage_current: 1,
-          startdate: null,
-          enddate: null,
-          projectcost: 0,
-          status: "inprogress"
-        }
-      ],
-      totalcost: 20000000
-    };
-    setChartData(thisData);
-  }
-
   useEffect(() => {
-    _onLocalhostFn(handleFetchTemp, handleLoadProject);
+    handleLoadProject();
   }, []);
 
   return (

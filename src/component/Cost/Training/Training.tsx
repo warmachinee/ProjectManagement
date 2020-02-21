@@ -25,7 +25,7 @@ const Training: React.FC<TrainingProps> = ({ costType }) => {
   const {
     apiUrl,
     fetchPost,
-    _onLocalhostFn,
+
     projectid,
     useConfirmDeleteItem,
     setCostData,
@@ -77,76 +77,8 @@ const Training: React.FC<TrainingProps> = ({ costType }) => {
     await handleLoadCost();
   }
 
-  function handleFetchTemp() {
-    setCostData([
-      {
-        costid: 3880694,
-        content: "Javascript",
-        estimate_value: 0,
-        actual_value: 0,
-        manday: 0,
-        amount: 0,
-        day: 0
-      },
-      {
-        costid: 3568557,
-        content: "Big Data",
-        estimate_value: 0,
-        actual_value: 0,
-        manday: 0,
-        amount: 0,
-        day: 0
-      },
-      {
-        costid: 8049807,
-        content: "Data Analytics",
-        estimate_value: 0,
-        actual_value: 0,
-        manday: 0,
-        amount: 0,
-        day: 0
-      },
-      {
-        costid: 5274195,
-        content: "Data Mining",
-        estimate_value: 0,
-        actual_value: 0,
-        manday: 0,
-        amount: 0,
-        day: 0
-      },
-      {
-        costid: 8659499,
-        content: "Machine Learning",
-        estimate_value: 0,
-        actual_value: 0,
-        manday: 0,
-        amount: 0,
-        day: 0
-      },
-      {
-        costid: 1043897,
-        content: "ReactJS",
-        estimate_value: 0,
-        actual_value: 0,
-        manday: 0,
-        amount: 0,
-        day: 0
-      },
-      {
-        costid: 8305230,
-        content: "Python",
-        estimate_value: 0,
-        actual_value: 0,
-        manday: 0,
-        amount: 0,
-        day: 0
-      }
-    ]);
-  }
-
   useEffect(() => {
-    _onLocalhostFn(handleFetchTemp, handleLoadCost);
+    handleLoadCost();
   }, []);
 
   return (

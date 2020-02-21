@@ -25,7 +25,7 @@ const Customization: React.FC<CustomizationProps> = ({ costType }) => {
   const {
     apiUrl,
     fetchPost,
-    _onLocalhostFn,
+
     projectid,
     useConfirmDeleteItem,
     setCostData,
@@ -77,35 +77,8 @@ const Customization: React.FC<CustomizationProps> = ({ costType }) => {
     await handleLoadCost();
   }
 
-  function handleFetchTemp() {
-    setCostData([
-      {
-        costid: 8087854,
-        content: "Installing",
-        estimate_value: 0,
-        actual_value: 0,
-        educational: "Master Degree",
-        experience: "2 Years",
-        salary: 0,
-        man: 0,
-        manmonth: 0
-      },
-      {
-        costid: 4307000,
-        content: "Editing",
-        estimate_value: 0,
-        actual_value: 0,
-        educational: "Master Degree",
-        experience: "5 Years",
-        salary: 0,
-        man: 0,
-        manmonth: 0
-      }
-    ]);
-  }
-
   useEffect(() => {
-    _onLocalhostFn(handleFetchTemp, handleLoadCost);
+    handleLoadCost();
   }, []);
 
   return (

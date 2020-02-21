@@ -36,7 +36,7 @@ const EstimateActual: React.FC<EstimateActualProps> = () => {
     apiUrl,
     fetchPost,
     projectid,
-    _onLocalhostFn,
+
     _thousandSeperater,
     _totalFromArray,
     _capitalizeFirstLetter,
@@ -85,38 +85,8 @@ const EstimateActual: React.FC<EstimateActualProps> = () => {
     setChartData(response);
   }
 
-  function handleFetchTemp() {
-    const thisData = {
-      projectcost: {
-        projectid: 9422312,
-        projectname: "Energy Project",
-        projectcost: 27000000,
-        op: 2349000,
-        op_percent: 8.7,
-        mf: 1350000,
-        mf_percent: 5,
-        guarantee_percent: 5,
-        guarantee_period: 0,
-        contractbegin: "2020-02-28T17:00:00.000Z",
-        ownername: null,
-        totalest: 2656000,
-        totalact: 1015650
-      },
-      detail: [
-        { type: "hardware", sumest: 1036000, sumact: 1015500 },
-        { type: "software", sumest: 0, sumact: 0 },
-        { type: "customization", sumest: 1050000, sumact: 0 },
-        { type: "training", sumest: 170000, sumact: 0 },
-        { type: "managementfee", sumest: 400000, sumact: 150 },
-        { type: "entertain", sumest: 0, sumact: 0 },
-        { type: "travel", sumest: 0, sumact: 0 }
-      ]
-    };
-    setChartData(thisData);
-  }
-
   useEffect(() => {
-    _onLocalhostFn(handleFetchTemp, handleLoadCost);
+    handleLoadCost();
   }, []);
 
   return (

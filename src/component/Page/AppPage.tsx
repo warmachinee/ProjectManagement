@@ -1,4 +1,4 @@
-import React, { useContext, useState, useReducer, useMemo } from "react";
+import React, { useContext, useState, useReducer } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Loadable from "react-loadable";
 import { AppContext } from "../../AppContext";
@@ -88,13 +88,9 @@ const AppPage: React.FC<AppPageProps> = React.memo(props => {
     apiUrl,
     fetchGet,
     handleCheckSession,
-    booleanReducer,
-    _onLocalhost
+    booleanReducer
   } = useContext(AppContext);
-  const isAuth = _onLocalhost(
-    true,
-    sess && sess.status !== "need login before"
-  );
+  const isAuth = sess && sess.status !== "need login before";
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [dialog, booleanDispatch] = useReducer<
     React.Reducer<AppType.BooleanReducerState, AppType.BooleanReducerActions>
@@ -159,7 +155,7 @@ const AppPage: React.FC<AppPageProps> = React.memo(props => {
           )}
           <MenuItem onClick={handleLogout}>Logout</MenuItem>
         </Menu>
-        {/* {!isAuth && <Redirect to="/" />} */}
+        {!isAuth && <Redirect to="/" />}
       </div>
     </AppContext.Provider>
   );
