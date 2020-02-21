@@ -57,7 +57,7 @@ const EntertainAndTravel: React.FC<{ [keys: string]: any }> = props => {
         type,
         content,
         value: parseInt(values.costValue),
-        setupdate: _dateToAPI(setupdate)
+        setupdate: _dateToAPI(setupdate) ? _dateToAPI(setupdate) : ""
       }
     });
     console.log(response);
@@ -71,6 +71,7 @@ const EntertainAndTravel: React.FC<{ [keys: string]: any }> = props => {
         <SelectCostType {...{ type, setType }} />
         <div style={{ width: 8 }} />
         <DatePicker
+          clearable
           autoOk
           fullWidth
           className={classes.costTextField}
@@ -78,7 +79,7 @@ const EntertainAndTravel: React.FC<{ [keys: string]: any }> = props => {
           inputVariant="outlined"
           label="Date"
           value={setupdate}
-          onChange={(d: any) => setSetupdate(new Date(d))}
+          onChange={(d: any) => setSetupdate(d ? new Date(d) : d)}
           views={["year", "month", "date"]}
         />
       </div>

@@ -9,6 +9,7 @@ const useStyles = makeStyles(theme => ({
   index: { ..._getWidth(36) },
   item: { minWidth: 300 },
   amount: { ..._getWidth(100) },
+  unit: { ..._getWidth(100) },
   price: { ..._getWidth(120) },
   estimate: { ..._getWidth(150) },
   actual: { ..._getWidth(150) }
@@ -39,6 +40,9 @@ const HardwareSoftwareHead: React.FC<HardwareSoftwareHeadProps> = () => {
         <StyledTableCell className={classes.item}>Item</StyledTableCell>
         <StyledTableCell className={classes.amount} align="right">
           Amount
+        </StyledTableCell>
+        <StyledTableCell className={classes.unit} align="right">
+          Unit
         </StyledTableCell>
         <StyledTableCell className={classes.price} align="right">
           Price

@@ -31,7 +31,7 @@ const App: React.FC<AppProps> = () => {
   const classes = useStyles();
   const [sess, setSess] = useState<AppType.Session>(
     api._onLocalhost({
-      type: "user",
+      type: "manager",
       fullname: "Sippakorn",
       lastname: "Suphapinyo",
       photopath: null

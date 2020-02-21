@@ -43,7 +43,7 @@ const SelectProjectType: React.FC<any> = props => {
         labelWidth={labelWidth}
       >
         <MenuItem value={1}>Normal</MenuItem>
-        <MenuItem value={2}>Maintenance assistant</MenuItem>
+        <MenuItem value={2}>Maintenance Service Agreement</MenuItem>
       </Select>
     </FormControl>
   );
@@ -70,7 +70,7 @@ const SelectProjectStatus: React.FC<any> = props => {
       >
         <MenuItem value={"inprogress"}>Inprogress</MenuItem>
         <MenuItem value={"pending"}>Pending</MenuItem>
-        <MenuItem value={"pm"}>PM</MenuItem>
+        {/* <MenuItem value={"pm"}>PM</MenuItem> */}
         <MenuItem value={"complete"}>Complete</MenuItem>
         <MenuItem value={"fail"}>Fail</MenuItem>
       </Select>
@@ -185,6 +185,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = () => {
   } = useContext(AppContext);
   const [form, formOnChange, setForm] = useForm({
     projectname: "",
+    ownername: "",
     summary: ""
   });
   const [percent, setPercent] = useState<Percent>({
@@ -231,7 +232,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = () => {
       [name]: event.target.value
     });
   };
-  
+
   const handleChange = (name: keyof State) => (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -255,6 +256,9 @@ const ProjectDetail: React.FC<ProjectDetailProps> = () => {
     const returnedChange = {};
     if (form.projectname !== data.projectname) {
       Object.assign(returnedChange, { projectname: form.projectname });
+    }
+    if (form.ownername !== data.ownername) {
+      Object.assign(returnedChange, { ownername: form.ownername });
     }
     if (detectPercent(percent.op_percent) !== data.op_percent) {
       Object.assign(returnedChange, {
@@ -291,17 +295,21 @@ const ProjectDetail: React.FC<ProjectDetailProps> = () => {
           : parseInt(values.projectcost)
       });
     }
-    if (_dateToAPI(startdate) !== _dateToAPI(new Date(data.startdate))) {
-      Object.assign(returnedChange, { startdate: _dateToAPI(startdate) });
+    if (_dateToAPI(startdate) !== _dateToAPI(data.startdate)) {
+      Object.assign(returnedChange, {
+        startdate: _dateToAPI(startdate) ? _dateToAPI(startdate) : ""
+      });
     }
-    if (_dateToAPI(enddate) !== _dateToAPI(new Date(data.enddate))) {
-      Object.assign(returnedChange, { enddate: _dateToAPI(enddate) });
+    if (_dateToAPI(enddate) !== _dateToAPI(data.enddate)) {
+      Object.assign(returnedChange, {
+        enddate: _dateToAPI(enddate) ? _dateToAPI(enddate) : ""
+      });
     }
-    if (
-      _dateToAPI(contractbegin) !== _dateToAPI(new Date(data.contractbegin))
-    ) {
+    if (_dateToAPI(contractbegin) !== _dateToAPI(data.contractbegin)) {
       Object.assign(returnedChange, {
         contractbegin: _dateToAPI(contractbegin)
+          ? _dateToAPI(contractbegin)
+          : ""
       });
     }
     if (type !== data.type) {
@@ -332,6 +340,7 @@ const ProjectDetail: React.FC<ProjectDetailProps> = () => {
   function setInitialData() {
     setForm({
       projectname: data.projectname ? data.projectname : "",
+      ownername: data.ownername ? data.ownername : "",
       summary: data.summary ? data.summary : ""
     });
     setPercent({
@@ -343,11 +352,9 @@ const ProjectDetail: React.FC<ProjectDetailProps> = () => {
       projectcost: data.projectcost ? data.projectcost.toString() : "0",
       guarantee_period: data.guarantee_period ? data.guarantee_period : 0
     });
-    setStartDate(data.startdate ? new Date(data.startdate) : new Date());
-    setEndDate(data.enddate ? new Date(data.enddate) : new Date());
-    setConstractBegin(
-      data.contractbegin ? new Date(data.contractbegin) : new Date()
-    );
+    setStartDate(data.startdate);
+    setEndDate(data.enddate);
+    setConstractBegin(data.contractbegin);
     setType(data.type ? data.type : 1);
     setStage(data.stage_current ? data.stage_current : 1);
     setStatus(data.status ? data.status : "inprogress");
@@ -359,177 +366,210 @@ const ProjectDetail: React.FC<ProjectDetailProps> = () => {
   }, []);
 
   return (
-    <div>
-      <Typography style={{ marginBottom: 16 }}>
-        {`Create Date : ${_dateToString(data.createdate)}`}
-      </Typography>
-      <SelectProjectType {...{ type, setType }} />
-      <TextField
-        fullWidth
-        className={classes.textField}
-        variant="outlined"
-        label="Project name"
-        name="projectname"
-        value={form.projectname}
-        onChange={formOnChange}
-      />
-      <Typography variant="h6" className={classes.label}>
-        Budget and Cost
-      </Typography>
-      <TextField
-        fullWidth
-        className={classes.textField}
-        variant="outlined"
-        label="Budget"
-        value={values.projectcost}
-        onChange={handleChange("projectcost")}
-        InputProps={{
-          startAdornment: <InputAdornment position="start">฿</InputAdornment>,
-          inputComponent: NumberFormatCustom as any
-        }}
-        onFocus={e => e.target.select()}
-      />
-      <div className={classes.flexGrid}>
-        <TextField
-          fullWidth
-          variant="outlined"
-          label="Operation"
-          helperText="Operation Percent"
-          type={"number"}
-          name="op_percent"
-          value={percent.op_percent}
-          onChange={handleChangePercent("op_percent")}
-          InputProps={{
-            endAdornment: <InputAdornment position="start">%</InputAdornment>
-          }}
-          onFocus={e => e.target.select()}
-        />
-        <div style={{ width: 8 }} />
-        <TextField
-          fullWidth
-          variant="outlined"
-          label="Management Fee"
-          helperText="Management Fee Percent"
-          type={"number"}
-          name="mf_percent"
-          value={percent.mf_percent}
-          onChange={handleChangePercent("mf_percent")}
-          InputProps={{
-            endAdornment: <InputAdornment position="start">%</InputAdornment>
-          }}
-          onFocus={e => e.target.select()}
-        />
-      </div>
-      <Typography variant="h6" className={classes.label}>
-        Date
-      </Typography>
-      <div className={classes.flexGrid}>
-        <DatePicker
-          autoOk
-          fullWidth
-          variant="inline"
-          inputVariant="outlined"
-          label="Start date"
-          value={startdate}
-          onChange={(date: any) => setStartDate(new Date(date))}
-          views={["year", "month", "date"]}
-        />
-        <div style={{ width: 8 }} />
-        <DatePicker
-          autoOk
-          fullWidth
-          variant="inline"
-          inputVariant="outlined"
-          label="End date"
-          value={enddate}
-          onChange={(date: any) => setEndDate(new Date(date))}
-        />
-        <div style={{ width: 8 }} />
-        <DatePicker
-          autoOk
-          fullWidth
-          variant="inline"
-          inputVariant="outlined"
-          label="Contract"
-          helperText="Contract start date"
-          value={contractbegin}
-          onChange={(date: any) => setConstractBegin(new Date(date))}
-        />
-      </div>
-      <Typography variant="h6" className={classes.label}>
-        Guarantee
-      </Typography>
-      <div className={classes.flexGrid}>
-        <TextField
-          fullWidth
-          className={classes.textField}
-          variant="outlined"
-          label="Percent"
-          helperText="Guarantee Percent"
-          type={"number"}
-          name="guarantee_percent"
-          value={percent.guarantee_percent}
-          onChange={handleChangePercent("guarantee_percent")}
-          InputProps={{
-            endAdornment: <InputAdornment position="start">%</InputAdornment>
-          }}
-          onFocus={e => e.target.select()}
-        />
-        <div style={{ width: 8 }} />
-        <TextField
-          fullWidth
-          className={classes.textField}
-          variant="outlined"
-          label="Period"
-          helperText="Guarantee Period"
-          type={"number"}
-          value={values.guarantee_period}
-          onChange={handleChange("guarantee_period")}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="start">{`Day${
-                values.guarantee_period > 1 ? "s" : ""
-              }`}</InputAdornment>
-            )
-          }}
-          onFocus={e => e.target.select()}
-        />
-      </div>
-      <Typography variant="h6" className={classes.label}>
-        Other
-      </Typography>
-      <div className={classes.flexGrid}>
-        <SelectProjectPotential {...{ potential, setPotential }} />
-        <div style={{ width: 8 }} />
-        <SelectProjectStatus {...{ status, setStatus }} />
-        <div style={{ width: 8 }} />
-        <SelectProjectStage {...{ stage, setStage }} />
-      </div>
-      <Typography variant="h6" className={classes.label}>
-        Project Summary
-      </Typography>
-      <TextField
-        fullWidth
-        multiline
-        rows="6"
-        className={classes.textField}
-        variant="outlined"
-        label="Summary"
-        name="summary"
-        value={form.summary}
-        onChange={formOnChange}
-      />
-      <Button
-        disabled={_isObjectEmpty(detectChange())}
-        style={{ width: "100%", marginTop: 12 }}
-        variant="contained"
-        color="primary"
-        size="large"
-        onClick={handleSave}
-      >
-        Save
-      </Button>
-    </div>
+    <React.Fragment>
+      {data && (
+        <React.Fragment>
+          <Typography style={{ marginBottom: 16 }}>
+            {`Create Date : ${
+              data.createdate ? _dateToString(data.createdate) : "Create date"
+            }`}
+          </Typography>
+          <SelectProjectType {...{ type, setType }} />
+          <TextField
+            fullWidth
+            className={classes.textField}
+            variant="outlined"
+            label="Project name"
+            name="projectname"
+            value={form.projectname}
+            onChange={formOnChange}
+          />
+          <Typography variant="h6" className={classes.label}>
+            Budget and Cost
+          </Typography>
+          <TextField
+            fullWidth
+            className={classes.textField}
+            variant="outlined"
+            label="Budget"
+            value={values.projectcost}
+            onChange={handleChange("projectcost")}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">฿</InputAdornment>
+              ),
+              inputComponent: NumberFormatCustom as any
+            }}
+            onFocus={e => e.target.select()}
+          />
+          <div className={classes.flexGrid}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Operation"
+              helperText="Operation Percent"
+              type={"number"}
+              name="op_percent"
+              value={percent.op_percent}
+              onChange={handleChangePercent("op_percent")}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="start">%</InputAdornment>
+                )
+              }}
+              onFocus={e => e.target.select()}
+            />
+            <div style={{ width: 8 }} />
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Management Fee"
+              helperText="Management Fee Percent"
+              type={"number"}
+              name="mf_percent"
+              value={percent.mf_percent}
+              onChange={handleChangePercent("mf_percent")}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="start">%</InputAdornment>
+                )
+              }}
+              onFocus={e => e.target.select()}
+            />
+          </div>
+          <Typography variant="h6" className={classes.label}>
+            Date
+          </Typography>
+          <div className={classes.flexGrid}>
+            <DatePicker
+              clearable
+              fullWidth
+              inputVariant="outlined"
+              label="Start date"
+              value={startdate}
+              onChange={(d: any) => setStartDate(d ? new Date(d) : d)}
+              labelFunc={() => {
+                return startdate ? _dateToString(startdate) : "Select date";
+              }}
+            />
+            <div style={{ width: 8 }} />
+            <DatePicker
+              clearable
+              fullWidth
+              inputVariant="outlined"
+              label="End date"
+              value={enddate}
+              onChange={(d: any) => setEndDate(d ? new Date(d) : d)}
+              labelFunc={() => {
+                return enddate ? _dateToString(enddate) : "Select date";
+              }}
+            />
+            <div style={{ width: 8 }} />
+            <DatePicker
+              clearable
+              fullWidth
+              inputVariant="outlined"
+              label="Contract"
+              helperText="Contract start date"
+              value={contractbegin}
+              onChange={(d: any) => setConstractBegin(d ? new Date(d) : d)}
+              labelFunc={() => {
+                return contractbegin
+                  ? _dateToString(contractbegin)
+                  : "Select date";
+              }}
+            />
+          </div>
+          <Typography variant="h6" className={classes.label}>
+            Guarantee
+          </Typography>
+          <div className={classes.flexGrid}>
+            <TextField
+              fullWidth
+              className={classes.textField}
+              variant="outlined"
+              label="Percent"
+              helperText="Guarantee Percent"
+              type={"number"}
+              name="guarantee_percent"
+              value={percent.guarantee_percent}
+              onChange={handleChangePercent("guarantee_percent")}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="start">%</InputAdornment>
+                )
+              }}
+              onFocus={e => e.target.select()}
+            />
+            <div style={{ width: 8 }} />
+            <TextField
+              fullWidth
+              className={classes.textField}
+              variant="outlined"
+              label="Period"
+              helperText="Guarantee Period"
+              type={"number"}
+              value={values.guarantee_period}
+              onChange={handleChange("guarantee_period")}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="start">{`Day${
+                    values.guarantee_period > 1 ? "s" : ""
+                  }`}</InputAdornment>
+                )
+              }}
+              onFocus={e => e.target.select()}
+            />
+          </div>
+          <Typography variant="h6" className={classes.label}>
+            Owner
+          </Typography>
+          <TextField
+            fullWidth
+            className={classes.textField}
+            variant="outlined"
+            label="Owner name"
+            name="ownername"
+            value={form.ownername}
+            onChange={formOnChange}
+          />
+          <Typography variant="h6" className={classes.label}>
+            Other
+          </Typography>
+          <div className={classes.flexGrid}>
+            <SelectProjectPotential {...{ potential, setPotential }} />
+            <div style={{ width: 8 }} />
+            <SelectProjectStatus {...{ status, setStatus }} />
+            <div style={{ width: 8 }} />
+            <SelectProjectStage {...{ stage, setStage }} />
+          </div>
+          <Typography variant="h6" className={classes.label}>
+            Project Summary
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows="6"
+            className={classes.textField}
+            variant="outlined"
+            label="Summary"
+            name="summary"
+            value={form.summary}
+            onChange={formOnChange}
+          />
+          <Button
+            disabled={_isObjectEmpty(detectChange())}
+            style={{ width: "100%", marginTop: 12 }}
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={handleSave}
+          >
+            Save
+          </Button>
+        </React.Fragment>
+      )}
+    </React.Fragment>
   );
 };
 export default ProjectDetail;

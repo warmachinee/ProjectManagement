@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState, useCallback } from "react";
+import React, { useContext, useState, useCallback } from "react";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { Link as RouterLink } from "react-router-dom";
 import {
@@ -42,7 +42,9 @@ const ProjectTableBodyRow: React.FC<ProjectTableBodyRowProps> = props => {
     _dateToString,
     _thousandSeperater,
     handleMoveProject,
-    onDeleteProject
+    onDeleteProject,
+    sess,
+    userid
   } = useContext(AppContext);
   const [isHover, setIsHover] = useState<boolean>(false);
   const [{ isOver, isOverCurrent }, drop] = useDrop({
@@ -83,8 +85,8 @@ const ProjectTableBodyRow: React.FC<ProjectTableBodyRowProps> = props => {
         return "Inprogress";
       case "pending":
         return "Pending";
-      case "pm":
-        return "PM";
+      // case "pm":
+      //   return "PM";
       case "complete":
         return "Complete";
       case "fail":
@@ -111,25 +113,31 @@ const ProjectTableBodyRow: React.FC<ProjectTableBodyRowProps> = props => {
 
   return (
     <TableRow
-      ref={drop}
-      onDragEnd={onDragEnd}
-      style={{ backgroundColor, transition: ".2s" }}
-      onMouseEnter={() => setIsHover(true)}
-      onMouseLeave={() => setIsHover(false)}
+      {...(sess.type === "user" && {
+        ref: drop,
+        onDragEnd,
+        onMouseEnter: () => setIsHover(true),
+        onMouseLeave: () => setIsHover(false)
+      })}
     >
       <TableCell padding="checkbox">
-        {isHover && (
+        {isHover && sess.type === "user" ? (
           <div ref={drag}>
             <DragIndicator
               fontSize="small"
               style={{ cursor: "move", color: grey[400] }}
             />
           </div>
+        ) : (
+          <div style={{ width: 24, height: 24 }} />
         )}
       </TableCell>
       <TableCell align="right">{itemIndex + 1}</TableCell>
       <TableCell>
-        <Link component={RouterLink} to={`/project/${data.projectid}`}>
+        <Link
+          component={RouterLink}
+          to={`/${sess.type === "user" ? "project" : userid}/${data.projectid}`}
+        >
           {data.projectname}
         </Link>
       </TableCell>
@@ -149,7 +157,7 @@ const ProjectTableBodyRow: React.FC<ProjectTableBodyRowProps> = props => {
         {getLabelFromStatus(data.status)}
       </TableCell>
       <TableCell padding="checkbox">
-        {isHover ? (
+        {isHover && sess.type === "user" ? (
           <Tooltip
             title="Delete project"
             placement="top"

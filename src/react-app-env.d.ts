@@ -16,7 +16,7 @@ declare module "apptype" {
   export type ProjectStatus =
     | "inprogress"
     | "pending"
-    | "pm"
+    // | "pm"
     | "complete"
     | "fail";
   export type ProjectInformation = {

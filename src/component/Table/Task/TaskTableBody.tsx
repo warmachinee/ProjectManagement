@@ -17,7 +17,8 @@ const TaskTableBody: React.FC<TaskTableBodyProps> = React.memo(() => {
     projectid,
     handleLoadProjectDetail,
     _onEnter,
-    isDarkMode
+    isDarkMode,
+    sess
   } = useContext(AppContext);
   const [current, setCurrent] = useState<AppType.ProjectTask | null>(null);
   const [target, setTarget] = useState<AppType.ProjectTask | null>(null);
@@ -53,9 +54,12 @@ const TaskTableBody: React.FC<TaskTableBodyProps> = React.memo(() => {
 
   return (
     <TableBody>
-      <CreateTaskRow
-        {...{ taskName, setTaskName, _onEnter, handleCreateTask, isDarkMode }}
-      />
+      {sess.type === "user" && (
+        <CreateTaskRow
+          {...{ taskName, setTaskName, _onEnter, handleCreateTask, isDarkMode }}
+        />
+      )}
+
       {project && (
         <React.Fragment>
           {project.tasklist.map((d: AppType.ProjectTask, i: number) => {

@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { TableCell, InputBase, makeStyles } from "@material-ui/core";
+import { TableCell, InputBase, makeStyles, useTheme } from "@material-ui/core";
 import { AppContext } from "../../../AppContext";
 import NumberFormatCustom from "../../Utils/NumberFormatCustom";
 
@@ -15,7 +15,8 @@ const CellNumber: React.FC<any> = ({
   onEdit
 }) => {
   const classes = useStyles();
-  const { _onEnter } = useContext(AppContext);
+  const theme = useTheme();
+  const { _onEnter, sess } = useContext(AppContext);
 
   const handleChange = (name: any) => (
     event: React.ChangeEvent<HTMLInputElement>
@@ -26,11 +27,15 @@ const CellNumber: React.FC<any> = ({
     });
   };
 
+  let color = sess.type === "manager" ? theme.palette.text.primary : undefined;
+
   return (
     <TableCell>
       <InputBase
         fullWidth
+        disabled={sess.type === "manager"}
         classes={{ input: classes.input }}
+        style={{ color }}
         value={values[objKey]}
         placeholder={label}
         onChange={handleChange(objKey)}

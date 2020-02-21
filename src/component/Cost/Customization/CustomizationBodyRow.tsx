@@ -43,7 +43,8 @@ const CustomizationBodyRow: React.FC<CustomizationBodyRowProps | any> = ({
     _checkIsNaN,
     _isObjectEmpty,
     onDeleteCost,
-    handleMoveCost
+    handleMoveCost,
+    sess
   } = useContext(AppContext);
   const [isHover, setIsHover] = useState<boolean>(false);
   const [estimate, setEstimate] = useState<any>(data.estimate_value);
@@ -171,24 +172,19 @@ const CustomizationBodyRow: React.FC<CustomizationBodyRowProps | any> = ({
   }
 
   async function onEdit() {
-    console.log({
+    const sendObj = {
       action: "edit",
       type: costType,
       projectid,
       costid: data.costid,
       ...detectChange(),
-      ...detectEstimate()
-    });
+      ...detectEstimate(),
+      content: values.content
+    };
+    console.log(sendObj);
     const response = await fetchPost({
       url: apiUrl("costmanagement"),
-      body: {
-        action: "edit",
-        type: costType,
-        projectid,
-        costid: data.costid,
-        ...detectChange(),
-        ...detectEstimate()
-      }
+      body: sendObj
     });
     console.log(response);
     await handleLoadCost();
@@ -196,13 +192,16 @@ const CustomizationBodyRow: React.FC<CustomizationBodyRowProps | any> = ({
 
   return (
     <TableRow
-      {...{ ref: drop, onDragEnd }}
-      onMouseEnter={() => setIsHover(true)}
-      onMouseLeave={() => setIsHover(false)}
+      {...(sess.type === "user" && {
+        ref: drop,
+        onDragEnd,
+        onMouseEnter: () => setIsHover(true),
+        onMouseLeave: () => setIsHover(false)
+      })}
       style={{ backgroundColor, transition: ".2s" }}
     >
       <TableCell padding="checkbox">
-        {isHover ? (
+        {isHover && sess.type === "user" ? (
           <div ref={drag}>
             <DragIndicator
               fontSize="small"
@@ -272,7 +271,7 @@ const CustomizationBodyRow: React.FC<CustomizationBodyRowProps | any> = ({
               </IconButton>
             </Tooltip>
           )}
-          {isHover ? (
+          {isHover && sess.type === "user" ? (
             <Tooltip
               title="Delete cost"
               placement="top"

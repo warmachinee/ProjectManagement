@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { TableCell, InputBase, Button } from "@material-ui/core";
+import { TableCell, InputBase, Button, useTheme } from "@material-ui/core";
 import { AppContext } from "../../../../AppContext";
 
 const CellText: React.FC<any> = ({
@@ -9,7 +9,10 @@ const CellText: React.FC<any> = ({
   data,
   objKey
 }) => {
-  const { apiUrl, fetchPost, handleLoadProjectDetail } = useContext(AppContext);
+  const theme = useTheme();
+  const { apiUrl, fetchPost, handleLoadProjectDetail, sess } = useContext(
+    AppContext
+  );
   const thisData = data ? data : "";
   const [value, setValue] = useState(thisData);
 
@@ -23,15 +26,19 @@ const CellText: React.FC<any> = ({
     await handleLoadProjectDetail();
   }
 
+  let color = sess.type === "manager" ? theme.palette.text.primary : undefined;
+
   return (
     <TableCell>
       <InputBase
         fullWidth
+        disabled={sess.type === "manager"}
         multiline
         rowsMax="6"
         value={value}
         placeholder={label}
         onChange={e => setValue(e.target.value)}
+        style={{ color }}
       />
       {value !== thisData && (
         <Button

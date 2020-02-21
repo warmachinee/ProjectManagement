@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { TableCell, InputBase, makeStyles } from "@material-ui/core";
+import { TableCell, InputBase, makeStyles, useTheme } from "@material-ui/core";
 import { AppContext } from "../../../AppContext";
 import NumberFormatCustom from "../../Utils/NumberFormatCustom";
 
@@ -17,7 +17,9 @@ const CellNumberWithEstimate: React.FC<any> = ({
   estimateSumWithKey
 }) => {
   const classes = useStyles();
-  const { _checkIsNaN, _onEnter } = useContext(AppContext);
+  const theme = useTheme();
+  const { _checkIsNaN, _onEnter, sess } = useContext(AppContext);
+  let color = sess.type === "manager" ? theme.palette.text.primary : undefined;
 
   const handleChange = (name: any) => (
     event: React.ChangeEvent<HTMLInputElement>
@@ -34,6 +36,8 @@ const CellNumberWithEstimate: React.FC<any> = ({
       <InputBase
         fullWidth
         classes={{ input: classes.input }}
+        disabled={sess.type === "manager"}
+        style={{ color }}
         value={values[objKey]}
         placeholder={label}
         onChange={handleChange(objKey)}

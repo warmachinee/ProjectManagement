@@ -41,6 +41,22 @@ const Training = Loadable({
   loading: () => null
 });
 
+const ManagementFee = Loadable({
+  loader: () =>
+    import(
+      /* webpackChunkName: 'ManagementFee' */ "./ManagementFee/ManagementFee"
+    ),
+  loading: () => null
+});
+
+const EntertainTravel = Loadable({
+  loader: () =>
+    import(
+      /* webpackChunkName: 'EntertainTravel' */ "./EntertainTravel/EntertainTravel"
+    ),
+  loading: () => null
+});
+
 const GeneralDialog = Loadable({
   loader: () =>
     import(/* webpackChunkName: 'GeneralDialog' */ "../Dialog/GeneralDialog"),
@@ -62,11 +78,12 @@ const costTypeArr = [
   { value: "overview", label: "Overview" },
   { value: "hardware", label: "Hardware" },
   { value: "software", label: "Software" },
-  { value: "customization", label: "Customization" },
   { value: "training", label: "Training" },
   { value: "managementfee", label: "Management Fee" },
   { value: "entertain", label: "Entertain" },
-  { value: "travel", label: "Travel" }
+  { value: "travel", label: "Travel" },
+  { value: "customization", label: "Customization" },
+  { value: "other", label: "Other" }
 ];
 
 const CostController: React.FC<any> = ({ create, costType, setCostType }) => {
@@ -106,9 +123,14 @@ const CostController: React.FC<any> = ({ create, costType, setCostType }) => {
 
 const Cost: React.FC<CostProps> = ({ setMaxWidth }) => {
   const classes = useStyles();
-  const { apiUrl, fetchPost, booleanReducer, projectid } = useContext(
-    AppContext
-  );
+  const {
+    apiUrl,
+    fetchPost,
+    booleanReducer,
+    projectid,
+    sess,
+    userid
+  } = useContext(AppContext);
   const [{ create }, booleanDispatch] = useReducer<
     React.Reducer<AppType.BooleanReducerState, AppType.BooleanReducerActions>
   >(booleanReducer, {
@@ -123,25 +145,42 @@ const Cost: React.FC<CostProps> = ({ setMaxWidth }) => {
         return <CostOverview {...{ costType }} />;
       case "hardware":
       case "software":
+      case "other":
         return <HardwareSoftware {...{ costType }} />;
       case "customization":
         return <Customization {...{ costType }} />;
       case "training":
         return <Training {...{ costType }} />;
       case "managementfee":
-        return <CostOverview />;
+        return <ManagementFee {...{ costType }} />;
       case "entertain":
-        return <CostOverview />;
       case "travel":
-        return <CostOverview />;
+        return <EntertainTravel {...{ costType }} />;
       default:
         return null;
     }
   }
 
+  function getCreateComponent() {
+    switch (costType) {
+      case "entertain":
+      case "travel":
+        return null;
+      default:
+        return <CreateCost {...{ costType }} />;
+    }
+  }
+
+  function getLabel() {
+    return costTypeArr.filter(item => {
+      return item.value === costType;
+    })[0].label;
+  }
+
   const passingProps: any = {
     ...useContext(AppContext),
     costType,
+    setCostType,
     booleanDispatch,
     costData,
     setCostData,
@@ -151,7 +190,12 @@ const Cost: React.FC<CostProps> = ({ setMaxWidth }) => {
   async function handleLoadCost() {
     const response: any = await fetchPost({
       url: apiUrl("loadproject"),
-      body: { action: "cost", projectid, type: costType }
+      body: {
+        action: "cost",
+        projectid,
+        type: costType,
+        ...(sess.type === "manager" && userid && { userid })
+      }
     });
     setCostData(response);
   }
@@ -167,28 +211,12 @@ const Cost: React.FC<CostProps> = ({ setMaxWidth }) => {
     }
   }, [costType]);
 
-  function getCreateComponent() {
-    switch (costType) {
-      case "hardware":
-      case "software":
-      case "customization":
-      case "training":
-      case "managementfee":
-        return <CreateCost {...{ costType }} />;
-      default:
-        return null;
-    }
-  }
-
-  function getLabel() {
-    return costTypeArr.filter(item => {
-      return item.value === costType;
-    })[0].label;
-  }
   return (
     <AppContext.Provider value={passingProps}>
       <Paper elevation={2}>
-        <CostController {...{ create, costType, setCostType }} />
+        {sess.type === "user" && (
+          <CostController {...{ create, costType, setCostType }} />
+        )}
         {getComponent()}
       </Paper>
       <GeneralDialog

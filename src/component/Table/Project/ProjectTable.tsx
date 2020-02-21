@@ -98,7 +98,7 @@ const FormCreateProject: React.FC<{ [keys: string]: any }> = props => {
           <FormControlLabel
             value="2"
             control={<Radio color="primary" />}
-            label="Maintenance Assistant"
+            label="Maintenance Service Agreement"
           />
         </RadioGroup>
       </FormControl>
@@ -132,7 +132,9 @@ const ProjectTable: React.FC<ProjectTableProps> = () => {
     booleanReducer,
     useForm,
     _onEnter,
-    _onLocalhostFn
+    _onLocalhostFn,
+    sess,
+    userid
   } = useContext(AppContext);
   const [{ createProject, confirmDelete }, booleanDispatch] = useReducer<
     React.Reducer<AppType.BooleanReducerState, AppType.BooleanReducerActions>
@@ -220,7 +222,10 @@ const ProjectTable: React.FC<ProjectTableProps> = () => {
   async function handleLoadProject() {
     const response: AppType.ProjectTable = await fetchPost({
       url: apiUrl("loadproject"),
-      body: { action: "list" }
+      body: {
+        action: "list",
+        ...(sess.type === "manager" && userid && { userid })
+      }
     });
     setProjectList(response);
   }

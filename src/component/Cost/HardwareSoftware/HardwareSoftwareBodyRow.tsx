@@ -43,13 +43,15 @@ const HardwareSoftwareBodyRow: React.FC<HardwareSoftwareBodyRowProps | any> = ({
     _checkIsNaN,
     _isObjectEmpty,
     onDeleteCost,
-    handleMoveCost
+    handleMoveCost,
+    sess
   } = useContext(AppContext);
   const [isHover, setIsHover] = useState<boolean>(false);
   const [estimate, setEstimate] = useState<any>(data.estimate_value);
   const [values, setValues] = React.useState<any>({
     content: data.content,
     amount: data.amount,
+    unit: data.unit,
     price: data.price,
     actual_value: data.actual_value
   });
@@ -98,7 +100,8 @@ const HardwareSoftwareBodyRow: React.FC<HardwareSoftwareBodyRowProps | any> = ({
   function detectChange() {
     let sendObj = {};
     for (let i in values) {
-      const val = i === "content" ? values[i] : _checkIsNaN(values[i], 0);
+      const val =
+        i === "content" || i === "unit" ? values[i] : _checkIsNaN(values[i], 0);
       if (val !== data[i]) {
         Object.assign(sendObj, {
           [i === "actual_value" ? "value" : i]: val
@@ -121,7 +124,7 @@ const HardwareSoftwareBodyRow: React.FC<HardwareSoftwareBodyRowProps | any> = ({
     let arr = [];
     let sum = data.estimate_value;
     for (let i in values) {
-      if (i !== "content" && i !== "actual_value") {
+      if (i !== "content" && i !== "unit" && i !== "actual_value") {
         arr.push(_checkIsNaN(values[i], 0));
       }
     }
@@ -140,7 +143,7 @@ const HardwareSoftwareBodyRow: React.FC<HardwareSoftwareBodyRowProps | any> = ({
     let arr = [];
     let sum = 0;
     for (let i in thisVals) {
-      if (i !== "content" && i !== "actual_value") {
+      if (i !== "content" && i !== "unit" && i !== "actual_value") {
         arr.push(_checkIsNaN(thisVals[i], 0));
       }
     }
@@ -155,24 +158,19 @@ const HardwareSoftwareBodyRow: React.FC<HardwareSoftwareBodyRowProps | any> = ({
   }
 
   async function onEdit() {
-    console.log({
+    const sendObj = {
       action: "edit",
       type: costType,
       projectid,
       costid: data.costid,
       ...detectChange(),
-      ...detectEstimate()
-    });
+      ...detectEstimate(),
+      content: values.content
+    };
+    console.log(sendObj);
     const response = await fetchPost({
       url: apiUrl("costmanagement"),
-      body: {
-        action: "edit",
-        type: costType,
-        projectid,
-        costid: data.costid,
-        ...detectChange(),
-        ...detectEstimate()
-      }
+      body: sendObj
     });
     console.log(response);
     await handleLoadCost();
@@ -180,13 +178,16 @@ const HardwareSoftwareBodyRow: React.FC<HardwareSoftwareBodyRowProps | any> = ({
 
   return (
     <TableRow
-      {...{ ref: drop, onDragEnd }}
-      onMouseEnter={() => setIsHover(true)}
-      onMouseLeave={() => setIsHover(false)}
+      {...(sess.type === "user" && {
+        ref: drop,
+        onDragEnd,
+        onMouseEnter: () => setIsHover(true),
+        onMouseLeave: () => setIsHover(false)
+      })}
       style={{ backgroundColor, transition: ".2s" }}
     >
       <TableCell padding="checkbox">
-        {isHover ? (
+        {isHover && sess.type === "user" ? (
           <div ref={drag}>
             <DragIndicator
               fontSize="small"
@@ -209,6 +210,13 @@ const HardwareSoftwareBodyRow: React.FC<HardwareSoftwareBodyRowProps | any> = ({
         data={data.amount}
         label="Amount"
         objKey={"amount"}
+      />
+      <CellText
+        {...propsToCell}
+        data={data.unit}
+        label="Unit"
+        objKey={"unit"}
+        textAlign="right"
       />
       <CellNumberWithEstimate
         {...propsToCell}
@@ -238,7 +246,7 @@ const HardwareSoftwareBodyRow: React.FC<HardwareSoftwareBodyRowProps | any> = ({
               </IconButton>
             </Tooltip>
           )}
-          {isHover ? (
+          {isHover && sess.type === "user" ? (
             <Tooltip
               title="Delete cost"
               placement="top"

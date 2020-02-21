@@ -126,7 +126,7 @@ const CellDate: React.FC<any> = ({
       projectid,
       taskid: taskid,
       subtaskid,
-      [keys]: _dateToAPI(date)
+      [keys]: _dateToAPI(date) ? _dateToAPI(date) : ""
     });
     const response = await fetchPost({
       url: apiUrl("subtasksystem"),
@@ -135,7 +135,7 @@ const CellDate: React.FC<any> = ({
         projectid,
         taskid: taskid,
         subtaskid,
-        [keys]: _dateToAPI(date)
+        [keys]: _dateToAPI(date) ? _dateToAPI(date) : ""
       }
     });
     await handleLoadSubtask();
@@ -165,6 +165,7 @@ const CellDate: React.FC<any> = ({
   return (
     <TableCell>
       <DatePicker
+        clearable
         fullWidth
         inputVariant="outlined"
         label={label}
@@ -172,7 +173,7 @@ const CellDate: React.FC<any> = ({
         minDate={getMinDate()}
         minDateMessage=""
         {...getMaxDate()}
-        onChange={(d: any) => onEditDate(new Date(d))}
+        onChange={(d: any) => onEditDate(d ? new Date(d) : d)}
         labelFunc={() => {
           return date ? _dateToString(new Date(date)) : "Select date";
         }}

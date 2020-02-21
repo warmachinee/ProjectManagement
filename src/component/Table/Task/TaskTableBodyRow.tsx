@@ -72,7 +72,8 @@ const Task: React.FC<TaskProps & {
     _getDifferenceDate,
     projectid,
     project,
-    onClickAction
+    onClickAction,
+    sess
   } = useContext(AppContext);
   const propsToCell: any = {
     handleLoadProjectDetail,
@@ -156,16 +157,17 @@ const Task: React.FC<TaskProps & {
 
   return (
     <TableRow
-      {...(!expand && {
-        ref: drop,
-        onDragEnd,
-        onMouseEnter: () => setIsHover(true),
-        onMouseLeave: () => setIsHover(false)
-      })}
+      {...(!expand &&
+        sess.type === "user" && {
+          ref: drop,
+          onDragEnd,
+          onMouseEnter: () => setIsHover(true),
+          onMouseLeave: () => setIsHover(false)
+        })}
       style={{ backgroundColor, transition: ".2s" }}
     >
       <TableCell padding="checkbox">
-        {expand ? (
+        {expand && sess.type === "user" ? (
           <div style={{ width: 24, height: 24 }} />
         ) : isHover ? (
           <div ref={drag}>
@@ -221,8 +223,12 @@ const Task: React.FC<TaskProps & {
       />
       <TableCell padding="checkbox">
         <div style={{ display: "flex" }}>
-          {getNoteIcon()}
-          {expand ? (
+          {sess.type === "user" ? (
+            getNoteIcon()
+          ) : (
+            <div style={{ width: 24, height: 24, padding: 12 }} />
+          )}
+          {expand && sess.type === "user" ? (
             <div style={{ width: 24, height: 24, padding: 12 }} />
           ) : isHover ? (
             <Tooltip

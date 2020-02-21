@@ -93,8 +93,6 @@ export function _dateToString(date: string | number | Date) {
     month = thisD.getMonth() + 1;
     dateStr = `${_getMonthFromNumber(month)} ${day}, ${thisD.getFullYear()}`;
     return dateStr;
-  } else {
-    console.log("ERROR _dateToString", date);
   }
 }
 
@@ -106,8 +104,6 @@ export function _dateToAPI(date: string | number | Date) {
     month = thisD.getMonth() + 1;
     dateStr = `${thisD.getFullYear()}-${_get2DigitMonth(month)}-${day}`;
     return dateStr;
-  } else {
-    console.log("ERROR _dateToString", date);
   }
 }
 
@@ -220,9 +216,21 @@ export function _checkIsNaN(value: any, newValue: any) {
  */
 
 export function _totalFromArray(array: any[], key: string) {
-  let total = 0;
+  let total: number = 0;
   for (let i = 0; i < array.length; i++) {
     total += array[i][key];
+  }
+  return total;
+}
+
+export function _totalFromArrayObj(
+  array: any[],
+  key: string,
+  obj: { key: string; value: any }
+) {
+  let total: number = 0;
+  for (let i = 0; i < array.length; i++) {
+    total += array[i][obj.key] === obj.value ? array[i][key] : 0;
   }
   return total;
 }

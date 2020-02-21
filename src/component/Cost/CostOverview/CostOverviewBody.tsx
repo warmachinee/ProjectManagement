@@ -10,9 +10,12 @@ export interface CostOverviewBodyProps {}
 
 const CostOverviewBody: React.FC<CostOverviewBodyProps> = () => {
   const classes = useStyles();
-  const { costOverview, _thousandSeperater, _totalFromArray } = useContext(
-    AppContext
-  );
+  const {
+    costOverview,
+    _thousandSeperater,
+    _totalFromArray,
+    setCostType
+  } = useContext(AppContext);
 
   return (
     <TableBody>
@@ -25,6 +28,7 @@ const CostOverviewBody: React.FC<CostOverviewBodyProps> = () => {
                 <TableCell align="right">{i + 1}</TableCell>
                 <TableCell>
                   <Button
+                    onClick={() => setCostType(d.type)}
                     style={{ textTransform: "capitalize" }}
                     color="primary"
                   >

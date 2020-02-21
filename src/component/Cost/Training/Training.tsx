@@ -65,7 +65,7 @@ const Training: React.FC<TrainingProps> = ({ costType }) => {
       movetoseq: target.sequence
     });
     const response = await fetchPost({
-      url: apiUrl("tasksystem"),
+      url: apiUrl("costmanagement"),
       body: {
         action: "move",
         type: costType,

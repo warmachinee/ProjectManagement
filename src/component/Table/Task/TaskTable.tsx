@@ -66,7 +66,9 @@ const TaskTable: React.FC<TaskTableProps> = () => {
     _onLocalhostFn,
     projectid,
     useConfirmDeleteItem,
-    booleanReducer
+    booleanReducer,
+    userid,
+    sess
   } = useContext(AppContext);
   const [{ editProject, note }, booleanDispatch] = useReducer<
     React.Reducer<AppType.BooleanReducerState, AppType.BooleanReducerActions>
@@ -131,7 +133,11 @@ const TaskTable: React.FC<TaskTableProps> = () => {
   async function handleLoadProjectDetail() {
     const response: any | AppType.ProjectDetail = await fetchPost({
       url: apiUrl("loadproject"),
-      body: { action: "detail", projectid }
+      body: {
+        action: "detail",
+        projectid,
+        ...(sess.type === "manager" && userid && { userid })
+      }
     });
     setProject(response);
   }
@@ -142,9 +148,9 @@ const TaskTable: React.FC<TaskTableProps> = () => {
         projectname: "Energy Project",
         type: 1,
         stage_current: 1,
-        startdate: "2020-01-11T17:00:00.000Z",
-        enddate: "2020-03-04T17:00:00.000Z",
-        contractbegin: new Date().toISOString(),
+        startdate: "2020-02-28T07:13:15.000Z",
+        enddate: null,
+        contractbegin: null,
         projectcost: 20000000,
         profitcost: 0,
         summary: "This is summary",

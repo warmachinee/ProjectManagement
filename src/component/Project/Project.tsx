@@ -10,6 +10,7 @@ import {
   BarChart
 } from "@material-ui/icons";
 import { ButtonGroup, Button } from "@material-ui/core";
+import EstimateActual from "../Chart/Bar/EstimateActual";
 
 const TaskTable = Loadable({
   loader: () =>
@@ -34,7 +35,10 @@ const useStyles = makeStyles(theme => ({
   tabMenuIcon: { fontSize: 36 }
 }));
 
-export type ProjectProps = RouteComponentProps<{ projectid: string }>;
+export type ProjectProps = RouteComponentProps<{
+  projectid: string;
+  userid: string;
+}>;
 
 const PageMenu: React.FC<{
   page: string | null;
@@ -76,7 +80,6 @@ const PageMenu: React.FC<{
           Timeline
         </Button>
         <Button
-          disabled
           startIcon={<BarChart className={classes.tabMenuIcon} />}
           variant={page === "chart" ? "contained" : "outlined"}
           color={page === "chart" ? "primary" : "default"}
@@ -84,7 +87,7 @@ const PageMenu: React.FC<{
           className={classes.tabMenu}
           onClick={() => changePage("chart")}
         >
-          Charts
+          Chart
         </Button>
       </ButtonGroup>
     </div>
@@ -93,7 +96,10 @@ const PageMenu: React.FC<{
 
 const DefaultComponent: React.FC = () => {
   const classes = useStyles();
-  const [page, setPage] = React.useState<string | null>("task");
+  const { _onLocalhost } = useContext(AppContext);
+  const [page, setPage] = React.useState<string | null>(
+    _onLocalhost("chart", "task")
+  );
   const [maxWidth, setMaxWidth] = React.useState<any | null>(1200);
 
   function changePage(p: string) {
@@ -109,13 +115,17 @@ const DefaultComponent: React.FC = () => {
       case "timeline":
         return <div>Timeline</div>;
       case "chart":
-        return <div>Chart</div>;
+        return (
+          <div>
+            <EstimateActual />
+          </div>
+        );
       default:
         return null;
     }
   }
 
-  let margin = page === "task" ? "inherit" : "auto";
+  let margin = page === "cost" ? "inherit" : "auto";
 
   useEffect(() => {
     switch (page) {
@@ -153,6 +163,7 @@ const Project: React.FC<ProjectProps> = props => {
 
   const passingProps: any = {
     ...useContext(AppContext),
+    userid: parseInt(match.params.userid),
     projectid: parseInt(match.params.projectid)
   };
 

@@ -32,7 +32,8 @@ const ProjectTableDetail: React.FC<ProjectTableDetailProps> = () => {
     project,
     dialog,
     booleanDispatch,
-    _thousandSeperater
+    _thousandSeperater,
+    sess
   } = useContext(AppContext);
   const detail = project && project.projectdetail;
 
@@ -42,8 +43,8 @@ const ProjectTableDetail: React.FC<ProjectTableDetailProps> = () => {
         return "Inprogress";
       case "pending":
         return "Pending";
-      case "pm":
-        return "PM";
+      // case "pm":
+      //   return "PM";
       case "complete":
         return "Complete";
       case "fail":
@@ -75,15 +76,15 @@ const ProjectTableDetail: React.FC<ProjectTableDetailProps> = () => {
           <div style={{ display: "flex" }}>
             <div className={classes.projectTitle}>
               <Typography variant="h5">
-                {detail.projectname + `${detail.type === 1 ? " (MA)" : ""}`}
+                {detail.projectname + `${detail.type === 2 ? " (MA)" : ""}`}
               </Typography>
               <Typography variant="body2">
-                {_dateToString(detail.startdate)}
+                {detail.startdate ? _dateToString(detail.startdate) : "Start"}
                 {" - "}
-                {_dateToString(detail.enddate)}
+                {detail.enddate ? _dateToString(detail.enddate) : "End"}
               </Typography>
             </div>
-            <div>
+            {sess.type === "user" && (
               <Button
                 color="primary"
                 onClick={() =>
@@ -92,7 +93,7 @@ const ProjectTableDetail: React.FC<ProjectTableDetailProps> = () => {
               >
                 Edit
               </Button>
-            </div>
+            )}
           </div>
           <div className={classes.chipGrid}>
             <Chip

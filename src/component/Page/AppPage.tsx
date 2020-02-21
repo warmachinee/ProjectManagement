@@ -2,7 +2,7 @@ import React, { useContext, useState, useReducer, useMemo } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Loadable from "react-loadable";
 import { AppContext } from "../../AppContext";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, Redirect } from "react-router-dom";
 import * as AppType from "apptype";
 import { MenuItem, Menu } from "@material-ui/core";
 
@@ -29,6 +29,18 @@ const RouteProject = Loadable.Map({
   },
   render(loaded: any, props: any) {
     let Component = loaded.Project.default;
+    return <Route {...props} render={() => <Component {...props} />} />;
+  },
+  loading: () => null
+});
+
+const RouteUnderling = Loadable.Map({
+  loader: {
+    Underling: () =>
+      import(/* webpackChunkName: 'RouteUnderling' */ "../Account/Underling")
+  },
+  render(loaded: any, props: any) {
+    let Component = loaded.Underling.default;
     return <Route {...props} render={() => <Component {...props} />} />;
   },
   loading: () => null
@@ -115,7 +127,8 @@ const AppPage: React.FC<AppPageProps> = React.memo(props => {
             path="/"
             component={isAuth ? AccountPage : Authentication}
           />
-          <RouteProject path="/project/:projectid" />
+          <RouteProject exact path="/project/:projectid" />
+          <RouteUnderling path="/:userid" />
           <RouteProjectTable path="/project/" />
 
           <RouteTestApi path="/testapi" />
@@ -146,6 +159,7 @@ const AppPage: React.FC<AppPageProps> = React.memo(props => {
           )}
           <MenuItem onClick={handleLogout}>Logout</MenuItem>
         </Menu>
+        {!isAuth && <Redirect to="/" />}
       </div>
     </AppContext.Provider>
   );
